@@ -73,7 +73,7 @@ nf = NeuralForecast(
 # Recriar o NeuralForecast com o modelo carregado
 model = AutoTFT(h=1, loss=MAE(), config=config, num_samples=10)
 nf_loaded = NeuralForecast(models=[model], freq='H')
-nf_loaded = NeuralForecast.load(path='checkpoints/test_run/')
+nf_loaded = NeuralForecast.load(path='../checkpoints/test_run/')
 
 # Agora pode prever
 Y_hat_df = nf_loaded.predict(df=Y_df)
