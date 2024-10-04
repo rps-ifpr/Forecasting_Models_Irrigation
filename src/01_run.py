@@ -63,11 +63,11 @@ nf = NeuralForecast(
     freq='H')
 
 
-# nf.fit(df=Y_df)
-# nf.save(path='checkpoints/test_run/',
-#         model_index=None,
-#         overwrite=True,
-#         save_dataset=True)
+ nf.fit(df=Y_df)
+ nf.save(path='../checkpoints/test_run/',
+         model_index=None,
+         overwrite=True,
+        save_dataset=True)
 
 
 # Recriar o NeuralForecast com o modelo carregado
