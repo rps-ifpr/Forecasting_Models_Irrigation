@@ -1,5 +1,5 @@
-# BreadcrumbsForecasting_Models_Irrigation
-![](https://i.imgur.com/xG74tOh.png)
+# Forecasting Models Irrigation
+![](https://i.imgur.com/jYDN7PL.png)
 
 <p align="center">
   <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/cubos-academy/academy-template-readme-projects?color=%2304D361">
@@ -12,31 +12,17 @@
   
   <!-- <img alt="License" src="https://img.shields.io/badge/license-MIT-brightgreen"> -->
   
-   <a href="https://cubos.academy/">
-    <img alt="Feito pela Cubos Academy" src="https://img.shields.io/badge/feito-por%20Cubos%20Academy-D818A5">
-   </a>
-   
    <a href="https://github.com/cubos-academy/academy-template-readme-projects/stargazers">
     <img alt="Stargazers" src="https://img.shields.io/github/stars/cubos-academy/academy-template-readme-projects?style=social">
   </a>
   
-   <a href="https://www.twitter.com/cubosacademy/">
-    <img alt="Siga no Twitter" src="https://img.shields.io/twitter/url?url=https%3A%2F%2Fgithub.com%2Fcubos-academy%2Facademy-template-readme-projects">
-  </a>
-  
- 
-</p>
-<h1 align="center">
-    <img alt="Cubos Academy" title="#CubosAcademy" src="assets/Capa GItHub.png" />
-</h1>
-
 <h4 align="center"> 
-	🚧 Nome do Projeto 🚧
+	🚧 Forecasting_Models_Irrigation 🚧
 </h4>
 
 <p align="center">
 	<img alt="Status Em Desenvolvimento" src="https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-green">
-	<img alt="Status Concluído" src="https://img.shields.io/badge/STATUS-CONCLU%C3%8DDO-brightgreen">
+	<!-- <img alt="Status Concluído" src="https://img.shields.io/badge/STATUS-CONCLU%C3%8DDO-brightgreen">  -->
 </p>
 
 <p align="center">
