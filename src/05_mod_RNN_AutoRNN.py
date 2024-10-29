@@ -8,6 +8,7 @@ from neuralforecast.losses.pytorch import MQLoss
 import os
 import math
 
+
 def train_and_predict_auto_rnn(Y_df, horizon, config, output_path, full_horizon, model_name):
     """Treina o modelo AutoRNN, salva previsões e métricas nos diretórios especificados."""
 
@@ -53,7 +54,14 @@ def train_and_predict_auto_rnn(Y_df, horizon, config, output_path, full_horizon,
 
     for _ in range(n_predicts):
         step_forecast = nf_loaded.predict(df=combined_train)
-        step_forecast = step_forecast.rename(columns={applied_model_name: 'y'})
+
+        # Verificar as colunas do dataframe de previsão para identificar o nome da coluna de previsões
+        print("Colunas de step_forecast:", step_forecast.columns)
+
+        # Renomear a coluna de previsão para 'y' (assumindo que a coluna de previsão seja identificada pelo nome do modelo)
+        forecast_column = step_forecast.columns[-1]  # A coluna de previsão é provavelmente a última
+        step_forecast = step_forecast.rename(columns={forecast_column: 'y'})
+
         step_forecast = step_forecast.reset_index()
         step_forecast['unique_id'] = step_forecast.get('unique_id', 'serie_1').astype(str)
         combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y']]], ignore_index=True)
