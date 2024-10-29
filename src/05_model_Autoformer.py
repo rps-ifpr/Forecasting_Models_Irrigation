@@ -2,19 +2,18 @@ import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from neuralforecast.auto import AutoTFT
+from neuralforecast.auto import Autoformer
 from neuralforecast.losses.pytorch import MAE
-from ray import tune
 from neuralforecast.core import NeuralForecast
 from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, medianabs
 import math
 import os
 
-def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name):
-    """Treina o modelo AutoTFT, salva previsões e métricas nos diretórios especificados."""
+def train_and_predict(Y_df, horizon, output_path, full_horizon, model_name):
+    """Treina o modelo Autoformer, salva previsões e métricas nos diretórios especificados."""
 
     # Nome do modelo aplicado
-    applied_model_name = 'AutoTFT'
+    applied_model_name = 'Autoformer'
 
     # Diretórios para salvar o modelo e resultados
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
@@ -26,7 +25,11 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
 
     # Treinamento do modelo
     start_time = time.time()
-    models = [AutoTFT(h=horizon, loss=MAE(), config=config, num_samples=10)]
+    models = [Autoformer(h=horizon, input_size=horizon,
+                         hidden_size=128, dropout=0.05, n_head=4,
+                         max_steps=500, learning_rate=0.0001,
+                         batch_size=32, loss=MAE())]
+
     nf = NeuralForecast(models=models, freq='H')
     nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
@@ -93,26 +96,13 @@ if __name__ == '__main__':
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo AutoTFT
-    config = {
-        "input_size": tune.choice([horizon]),
-        "hidden_size": tune.choice([8, 32]),
-        "n_head": tune.choice([2, 8]),
-        "learning_rate": tune.loguniform(1e-4, 1e-1),
-        "scaler_type": tune.choice(['robust', 'standard']),
-        "max_steps": tune.choice([500, 1000]),
-        "windows_batch_size": tune.choice([8, 32]),
-        "check_val_every_n_epoch": tune.choice([100]),
-        "random_seed": tune.randint(1, 20),
-    }
-
-    model_name = 'AutoTFT_modelo_inicial'
-    forecast, metrics = train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name)
+    model_name = 'Autoformer'
+    forecast, metrics = train_and_predict(Y_df, horizon, output_path, full_horizon, model_name)
 
     # Plot comparativo
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo AutoTFT
+    # Previsões do modelo Autoformer
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
