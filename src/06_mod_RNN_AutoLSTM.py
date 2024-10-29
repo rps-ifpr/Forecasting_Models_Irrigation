@@ -2,19 +2,19 @@ import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from neuralforecast.auto import AutoTFT
-from neuralforecast.losses.pytorch import MAE
+from neuralforecast import NeuralForecast
+from neuralforecast.models import LSTM
+from neuralforecast.losses.pytorch import DistributionLoss
 from ray import tune
-from neuralforecast.core import NeuralForecast
 from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, medianabs
 import math
 import os
 
 def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name):
-    """Treina o modelo AutoTFT, salva previsões e métricas nos diretórios especificados."""
+    """Treina o modelo LSTM, salva previsões e métricas nos diretórios especificados."""
 
     # Nome do modelo aplicado
-    applied_model_name = 'AutoTFT'
+    applied_model_name = 'LSTM'
 
     # Diretórios para salvar o modelo e resultados
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
@@ -26,7 +26,18 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
 
     # Treinamento do modelo
     start_time = time.time()
-    models = [AutoTFT(h=horizon, loss=MAE(), config=config, num_samples=10)]
+    models = [LSTM(
+        h=horizon,
+        input_size=-1,
+        loss=DistributionLoss(distribution='Normal', level=[80, 90]),
+        scaler_type='robust',
+        encoder_n_layers=config["encoder_n_layers"],
+        encoder_hidden_size=config["encoder_hidden_size"],
+        context_size=config["context_size"],
+        decoder_hidden_size=config["decoder_hidden_size"],
+        decoder_layers=config["decoder_layers"],
+        max_steps=config["max_steps"]
+    )]
     nf = NeuralForecast(models=models, freq='H')
     nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
@@ -105,38 +116,23 @@ if __name__ == '__main__':
     # Remover linhas com valores alvo ausentes e ordenar
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Verificar dados
-    print("Intervalo de Datas:", Y_df['ds'].min(), "até", Y_df['ds'].max())
-    print("Total de Linhas:", Y_df.shape[0])
-
-    # Verificar se os dados cobrem o intervalo esperado
-    expected_start_date = pd.to_datetime('2023-01-01 00:00:00')
-    expected_end_date = pd.to_datetime('2023-12-31 00:00:00')
-
-    if Y_df['ds'].min() > expected_start_date or Y_df['ds'].max() < expected_end_date:
-        print("Aviso: Os dados não cobrem todo o intervalo de datas esperado.")
-        # Você pode optar por encerrar ou lidar com este caso conforme necessário
-
-    # Configuração do modelo AutoTFT
+    # Configuração do modelo LSTM
     config = {
-        "input_size": tune.choice([horizon]),
-        "hidden_size": tune.choice([8, 32]),
-        "n_head": tune.choice([2, 8]),
-        "learning_rate": tune.loguniform(1e-4, 1e-1),
-        "scaler_type": tune.choice(['robust', 'standard']),
-        "max_steps": tune.choice([500, 1000]),
-        "windows_batch_size": tune.choice([8, 32]),
-        "check_val_every_n_epoch": tune.choice([100]),
-        "random_seed": tune.randint(1, 20),
+        "encoder_n_layers": 2,
+        "encoder_hidden_size": 128,
+        "context_size": 10,
+        "decoder_hidden_size": 128,
+        "decoder_layers": 2,
+        "max_steps": 200
     }
 
-    model_name = 'AutoTFT_model'
+    model_name = 'LSTM_model'
     forecast, metrics = train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name)
 
     # Plot comparativo
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo AutoTFT
+    # Previsões do modelo LSTM
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
@@ -156,3 +152,4 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     plt.show()
+

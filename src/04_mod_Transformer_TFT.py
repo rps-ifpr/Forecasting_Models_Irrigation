@@ -2,7 +2,7 @@ import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from neuralforecast.auto import Autoformer
+from neuralforecast.auto import AutoTFT
 from neuralforecast.losses.pytorch import MAE
 from ray import tune
 from neuralforecast.core import NeuralForecast
@@ -10,12 +10,11 @@ from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, median
 import math
 import os
 
-
-def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name, input_size):
+def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name):
     """Treina o modelo AutoTFT, salva previsões e métricas nos diretórios especificados."""
 
     # Nome do modelo aplicado
-    applied_model_name = 'Autoformer'
+    applied_model_name = 'AutoTFT'
 
     # Diretórios para salvar o modelo e resultados
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
@@ -27,7 +26,7 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
 
     # Treinamento do modelo
     start_time = time.time()
-    models = [Autoformer(h=horizon, loss=MAE(), config=config, num_samples=10)]
+    models = [AutoTFT(h=horizon, loss=MAE(), config=config, num_samples=10)]
     nf = NeuralForecast(models=models, freq='H')
     nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
@@ -53,10 +52,11 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
     full_forecast = pd.concat(forecasts, ignore_index=True)
     full_forecast['model_name'] = model_name
 
-    # Salvando previsões e métricas em arquivos CSV
+    # Salvando previsões em arquivo CSV
     forecast_output_path = os.path.join(model_output_path, f'{applied_model_name}_{model_name}_full_forecast.csv')
     full_forecast.to_csv(forecast_output_path, index=False)
 
+    # Calculando métricas
     y_pred = full_forecast['y'].values
     y_true = Y_df['y'].iloc[-len(y_pred):].values
     rmse_value = rmse(y_true, y_pred)
@@ -88,11 +88,34 @@ if __name__ == '__main__':
     output_path = './output'
 
     # Carregar dados e preparar para o treinamento
-    Y_df = pd.read_csv(data_path, sep=';')
-    Y_df['ds'] = pd.to_datetime(Y_df['Data'] + ' ' + Y_df['Hora'], format='%Y-%m-%d %H:%M:%S')
+    Y_df = pd.read_csv(data_path, sep=';', usecols=lambda column: column != 'Unnamed: 19')
+
+    # Ajustar parsing de datas
+    Y_df['ds'] = pd.to_datetime(Y_df['Data'] + ' ' + Y_df['Hora'], errors='coerce')
+
+    # Remover linhas com datas não parseáveis
+    Y_df = Y_df.dropna(subset=['ds'])
+
+    # Preparar variável alvo
     Y_df['y'] = Y_df['TEMPERATURA DO AR BULBO SECO (°C)']
+
+    # Atribuir ID único
     Y_df['unique_id'] = 'serie_1'
+
+    # Remover linhas com valores alvo ausentes e ordenar
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
+
+    # Verificar dados
+    print("Intervalo de Datas:", Y_df['ds'].min(), "até", Y_df['ds'].max())
+    print("Total de Linhas:", Y_df.shape[0])
+
+    # Verificar se os dados cobrem o intervalo esperado
+    expected_start_date = pd.to_datetime('2023-01-01 00:00:00')
+    expected_end_date = pd.to_datetime('2023-12-31 00:00:00')
+
+    if Y_df['ds'].min() > expected_start_date or Y_df['ds'].max() < expected_end_date:
+        print("Aviso: Os dados não cobrem todo o intervalo de datas esperado.")
+        # Você pode optar por encerrar ou lidar com este caso conforme necessário
 
     # Configuração do modelo AutoTFT
     config = {
@@ -107,7 +130,7 @@ if __name__ == '__main__':
         "random_seed": tune.randint(1, 20),
     }
 
-    model_name = 'Autoformer'
+    model_name = 'AutoTFT_model'
     forecast, metrics = train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name)
 
     # Plot comparativo
