@@ -3,17 +3,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from neuralforecast import NeuralForecast
-from neuralforecast.models import RNN
-from neuralforecast.losses.pytorch import MQLoss
+from neuralforecast.models import TCN
+from neuralforecast.losses.pytorch import GMM
 from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, medianabs
 import math
 import os
 
-def train_and_predict_auto_rnn(Y_df, horizon, config, output_path, full_horizon, model_name):
-    """Treina o modelo AutoRNN, salva previsões e métricas nos diretórios especificados."""
+def train_and_predict_auto_tcn(Y_df, horizon, config, output_path, full_horizon, model_name):
+    """Treina o modelo AutoTCN, salva previsões e métricas nos diretórios especificados."""
 
     # Nome do modelo aplicado
-    applied_model_name = 'AutoRNN'
+    applied_model_name = 'AutoTCN'
 
     # Diretórios para salvar o modelo e resultados
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
@@ -25,18 +25,19 @@ def train_and_predict_auto_rnn(Y_df, horizon, config, output_path, full_horizon,
 
     # Treinamento do modelo
     start_time = time.time()
-    models = [RNN(
+    models = [TCN(
         h=horizon,
         input_size=-1,
-        inference_input_size=24,
-        loss=MQLoss(level=[80, 90]),
-        scaler_type='robust',
-        encoder_n_layers=config["encoder_n_layers"],
+        loss=GMM(n_components=7, return_params=True, level=[80, 90]),
+        learning_rate=5e-4,
+        kernel_size=2,
+        dilations=[1, 2, 4, 8, 16],
         encoder_hidden_size=config["encoder_hidden_size"],
         context_size=config["context_size"],
         decoder_hidden_size=config["decoder_hidden_size"],
         decoder_layers=config["decoder_layers"],
-        max_steps=config["max_steps"]
+        max_steps=config["max_steps"],
+        scaler_type='robust'
     )]
     nf = NeuralForecast(models=models, freq='H')
     nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
@@ -114,23 +115,22 @@ if __name__ == '__main__':
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo AutoRNN
+    # Configuração do modelo AutoTCN
     config = {
-        "encoder_n_layers": 2,
         "encoder_hidden_size": 128,
         "context_size": 10,
         "decoder_hidden_size": 128,
         "decoder_layers": 2,
-        "max_steps": 300
+        "max_steps": 500
     }
 
-    model_name = 'AutoRNN_model'
-    forecast, metrics = train_and_predict_auto_rnn(Y_df, horizon, config, output_path, full_horizon, model_name)
+    model_name = 'AutoTCN_model'
+    forecast, metrics = train_and_predict_auto_tcn(Y_df, horizon, config, output_path, full_horizon, model_name)
 
     # Plot comparativo
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo AutoRNN
+    # Previsões do modelo AutoTCN
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
@@ -150,5 +150,3 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     plt.show()
-
-
