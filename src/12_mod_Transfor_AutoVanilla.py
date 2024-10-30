@@ -57,17 +57,14 @@ def train_and_predict(Y_df, horizon, output_path, full_horizon, model_name):
     forecasts = []
 
     for _ in range(n_predicts):
-        combined_train['unique_id'] = combined_train['unique_id'].astype(str)  # Assegurando tipo string para unique_id
-        combined_train['ds'] = pd.to_datetime(combined_train['ds'])  # Assegurando que ds é datetime
         step_forecast = nf_loaded.predict(df=combined_train)
 
-        # Renomeando a coluna de previsão
+        # Renomeando a coluna de previsão e garantindo o tipo correto para 'ds'
         step_forecast = step_forecast.rename(columns={applied_model_name: 'y'})
         step_forecast['ds'] = pd.to_datetime(step_forecast['ds'])  # Garantindo que ds é datetime
-        step_forecast['unique_id'] = step_forecast['unique_id'].astype(str)  # Garantindo que unique_id é string
 
-        # Concatenando previsões para a próxima iteração
-        combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y']]], ignore_index=True)
+        # Concatenando previsões para a próxima iteração (sem 'unique_id')
+        combined_train = pd.concat([combined_train, step_forecast[['ds', 'y']]], ignore_index=True)
         forecasts.append(step_forecast)
 
     full_forecast = pd.concat(forecasts, ignore_index=True)
@@ -112,6 +109,7 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     plt.show()
+
 
 
 
