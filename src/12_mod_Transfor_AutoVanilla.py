@@ -55,7 +55,7 @@ def train_and_predict_auto_vanilla(Y_df, horizon, config, output_path, full_hori
     combined_train = Y_df_augmented[['unique_id', 'ds', 'y'] + calendar_cols].copy()
 
     # Gera o dataframe futuro esperado
-    futr_df = nf_loaded.make_future_dataframe(df=combined_train, h=full_horizon)
+    futr_df = nf_loaded.make_future_dataframe(df=combined_train)
 
     # Adiciona as colunas de calendário no futr_df gerado
     futr_df, _ = augment_calendar_df(futr_df, freq='H')
