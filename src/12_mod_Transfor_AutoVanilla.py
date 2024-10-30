@@ -3,17 +3,19 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from neuralforecast import NeuralForecast
-from neuralforecast.models import BiTCN
-from neuralforecast.losses.pytorch import GMM
+from neuralforecast.models import VanillaTransformer
+from neuralforecast.losses.pytorch import MAE
+from neuralforecast.utils import augment_calendar_df
 from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, medianabs
 import math
 import os
 
-def train_and_predict_auto_bitcn(Y_df, horizon, config, output_path, full_horizon, model_name):
-    """Treina o modelo AutoBiTCN, salva previsões e métricas nos diretórios especificados."""
+
+def train_and_predict_auto_vanilla(Y_df, horizon, config, output_path, full_horizon, model_name):
+    """Treina o modelo AutoVanilla, salva previsões e métricas nos diretórios especificados."""
 
     # Nome do modelo aplicado
-    applied_model_name = 'AutoBiTCN'
+    applied_model_name = 'AutoVanilla'
 
     # Diretórios para salvar o modelo e resultados
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
@@ -23,17 +25,25 @@ def train_and_predict_auto_bitcn(Y_df, horizon, config, output_path, full_horizo
     os.makedirs(model_output_path, exist_ok=True)
     os.makedirs(log_output_path, exist_ok=True)
 
+    # Adicionar variáveis de calendário ao dataset
+    Y_df_augmented, calendar_cols = augment_calendar_df(df=Y_df, freq='H')
+
     # Treinamento do modelo
     start_time = time.time()
-    models = [BiTCN(
+    models = [VanillaTransformer(
         h=horizon,
         input_size=config["input_size"],
-        loss=GMM(n_components=7, return_params=True, level=[80, 90]),
-        max_steps=config["max_steps"],
-        scaler_type=config["scaler_type"]
+        hidden_size=config["hidden_size"],
+        conv_hidden_size=config["conv_hidden_size"],
+        n_head=config["n_head"],
+        loss=MAE(),
+        futr_exog_list=calendar_cols,
+        scaler_type=config["scaler_type"],
+        learning_rate=config["learning_rate"],
+        max_steps=config["max_steps"]
     )]
     nf = NeuralForecast(models=models, freq='H')
-    nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
+    nf.fit(df=Y_df_augmented[['unique_id', 'ds', 'y'] + calendar_cols])
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
     end_time = time.time()
     print(f'Modelo {model_name} treinado em:', end_time - start_time, 'segundos')
@@ -41,21 +51,30 @@ def train_and_predict_auto_bitcn(Y_df, horizon, config, output_path, full_horizo
     # Carregando o modelo treinado para previsão
     nf_loaded = NeuralForecast.load(path=model_output_path)
 
+    # Define `combined_train` como uma cópia do conjunto de treino
+    combined_train = Y_df_augmented[['unique_id', 'ds', 'y'] + calendar_cols].copy()
+
+    # Gera o dataframe futuro esperado
+    futr_df = nf_loaded.make_future_dataframe(df=combined_train, h=full_horizon)
+
+    # Adiciona as colunas de calendário no futr_df gerado
+    futr_df, _ = augment_calendar_df(futr_df, freq='H')
+
     # Previsões de múltiplos passos
     n_predicts = math.ceil(full_horizon / horizon)
-    combined_train = Y_df[['unique_id', 'ds', 'y']].copy()
     forecasts = []
 
     for _ in range(n_predicts):
-        step_forecast = nf_loaded.predict(df=combined_train)
+        # Previsão com futr_df preenchido
+        step_forecast = nf_loaded.predict(df=combined_train, futr_df=futr_df[['unique_id', 'ds'] + calendar_cols])
 
         # Identificar e renomear a coluna de previsão
         forecast_column = step_forecast.columns[-1]
         step_forecast = step_forecast.rename(columns={forecast_column: 'y'})
 
         step_forecast = step_forecast.reset_index()
-        step_forecast['unique_id'] = step_forecast.get('unique_id', 'serie_1').astype(str)
-        combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y']]], ignore_index=True)
+        combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y'] + calendar_cols]],
+                                   ignore_index=True)
         forecasts.append(step_forecast)
 
     full_forecast = pd.concat(forecasts, ignore_index=True)
@@ -108,20 +127,24 @@ if __name__ == '__main__':
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo AutoBiTCN
+    # Configuração do modelo AutoVanilla
     config = {
         "input_size": 24,
-        "max_steps": 100,
-        "scaler_type": 'standard'
+        "hidden_size": 16,
+        "conv_hidden_size": 32,
+        "n_head": 2,
+        "learning_rate": 1e-3,
+        "scaler_type": 'robust',
+        "max_steps": 500
     }
 
-    model_name = 'AutoBiTCN_model'
-    forecast, metrics = train_and_predict_auto_bitcn(Y_df, horizon, config, output_path, full_horizon, model_name)
+    model_name = 'AutoVanilla_model'
+    forecast, metrics = train_and_predict_auto_vanilla(Y_df, horizon, config, output_path, full_horizon, model_name)
 
     # Plot comparativo
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo AutoBiTCN
+    # Previsões do modelo AutoVanilla
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
@@ -141,3 +164,6 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     plt.show()
+
+
+
