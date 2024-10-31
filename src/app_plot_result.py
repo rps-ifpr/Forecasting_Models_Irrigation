@@ -65,20 +65,24 @@ def load_metrics(file_path, model_name):
 
 # Carregar métricas dos modelos
 metrics_dfs = [
-    load_metrics(f'{output_path}/lightning_logs/LSTM_LSTM_model/LSTM_LSTM_model_metrics.csv', 'LSTM'),
-    load_metrics(f'{output_path}/lightning_logs/AutoTFT_AutoTFT_model/AutoTFT_AutoTFT_model_metrics.csv', 'AutoTFT'),
-    load_metrics(f'{output_path}/lightning_logs/AutoRNN_AutoRNN_model/AutoRNN_AutoRNN_model_metrics.csv', 'AutoRNN'),
-    load_metrics(f'{output_path}/lightning_logs/AutoInformer_AutoInformer_model/AutoInformer_AutoInformer_model_metrics.csv', 'AutoInformer'),
-    load_metrics(f'{output_path}/lightning_logs/VanillaTransformer_VanillaTransformer_model/VanillaTransformer_VanillaTransformer_model_metrics.csv', 'VanillaTransformer'),
+    load_metrics(f'{output_path}/lightning_logs/Autoformer_Autoformer_model/Autoformer_Autoformer_model_metrics.csv', 'Autoformer'),
     load_metrics(f'{output_path}/lightning_logs/AutoBiTCN_AutoBiTCN_model/AutoBiTCN_AutoBiTCN_model_metrics.csv', 'AutoBiTCN'),
     load_metrics(f'{output_path}/lightning_logs/AutoDeepAR_AutoDeepAR_model/AutoDeepAR_AutoDeepAR_model_metrics.csv', 'AutoDeepAR'),
     load_metrics(f'{output_path}/lightning_logs/AutoDilatedRNN_AutoDilatedRNN_model/AutoDilatedRNN_AutoDilatedRNN_model_metrics.csv', 'AutoDilatedRNN'),
     load_metrics(f'{output_path}/lightning_logs/AutoGRU_AutoGRU_model/AutoGRU_AutoGRU_model_metrics.csv', 'AutoGRU'),
-    load_metrics(f'{output_path}/lightning_logs/AutoTCN_AutoTCN_model/AutoTCN_AutoTCN_model_metrics.csv', 'AutoTCN')
+    load_metrics(f'{output_path}/lightning_logs/AutoInformer_AutoInformer_model/AutoInformer_AutoInformer_model_metrics.csv', 'AutoInformer'),
+    load_metrics(f'{output_path}/lightning_logs/AutoRNN_AutoRNN_model/AutoRNN_AutoRNN_model_metrics.csv', 'AutoRNN'),
+    load_metrics(f'{output_path}/lightning_logs/AutoTCN_AutoTCN_model/AutoTCN_AutoTCN_model_metrics.csv', 'AutoTCN'),
+    load_metrics(f'{output_path}/lightning_logs/AutoTFT_AutoTFT_model/AutoTFT_AutoTFT_model_metrics.csv', 'AutoTFT'),
+    load_metrics(f'{output_path}/lightning_logs/FEDformer_AutoFEDformer_model/FEDformer_AutoFEDformer_model_metrics.csv', 'FEDformer'),
+    load_metrics(f'{output_path}/lightning_logs/Informer_AutoInformer_model/Informer_AutoInformer_model_metrics.csv', 'Informer'),
+    load_metrics(f'{output_path}/lightning_logs/LSTM_LSTM_model/LSTM_LSTM_model_metrics.csv', 'LSTM'),
+    load_metrics(f'{output_path}/lightning_logs/PatchTST_AutoPatchTST_model/PatchTST_AutoPatchTST_model_metrics.csv', 'PatchTST'),
+    load_metrics(f'{output_path}/lightning_logs/VanillaTransformer_VanillaTransformer_model/VanillaTransformer_VanillaTransformer_model_metrics.csv', 'VanillaTransformer')
 ]
 
 # Filtrar métricas carregadas com sucesso para combinar no DataFrame
-metrics_df = pd.concat([df for df in metrics_dfs if df is not None])
+metrics_df = pd.concat([df for df in metrics_dfs if df is not None], ignore_index=True)
 
 # Configurar o DataFrame para exibir métricas lado a lado
 metrics_df = metrics_df.set_index(['Modelo', 'model_name']).T  # Transpor para facilitar a comparação
