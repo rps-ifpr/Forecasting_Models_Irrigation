@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
@@ -5,38 +6,46 @@ from matplotlib.dates import DateFormatter
 # Caminho para os arquivos de previsão e métricas
 output_path = './output'
 
-# Leitura dos arquivos de previsão
-lstm_forecast = pd.read_csv(f'{output_path}/checkpoints/LSTM_LSTM_model/LSTM_LSTM_model_full_forecast.csv')
-autotft_forecast = pd.read_csv(f'{output_path}/checkpoints/AutoTFT_AutoTFT_model/AutoTFT_AutoTFT_model_forecast.csv')
-autornn_forecast = pd.read_csv(f'{output_path}/checkpoints/AutoRNN_AutoRNN_model/AutoRNN_AutoRNN_model_full_forecast.csv')
+# Função para carregar um arquivo de previsão se existir
+def load_forecast(file_path, col_name):
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        return df.rename(columns={'y': col_name})
+    else:
+        print(f"Arquivo não encontrado: {file_path}")
+        return None
 
-# Leitura dos arquivos de métricas
-lstm_metrics = pd.read_csv(f'{output_path}/lightning_logs/LSTM_LSTM_model/LSTM_LSTM_model_metrics.csv')
-autotft_metrics = pd.read_csv(f'{output_path}/lightning_logs/AutoTFT_AutoTFT_model/AutoTFT_AutoTFT_model_metrics.csv')
-autornn_metrics = pd.read_csv(f'{output_path}/lightning_logs/AutoRNN_AutoRNN_model/AutoRNN_AutoRNN_model_metrics.csv')
+# Carregar arquivos de previsão, se existirem
+lstm_forecast = load_forecast(f'{output_path}/checkpoints/LSTM_LSTM_model/LSTM_LSTM_model_full_forecast.csv', 'LSTM_Prediction')
+autotft_forecast = load_forecast(f'{output_path}/checkpoints/AutoTFT_AutoTFT_model/AutoTFT_AutoTFT_model_full_forecast.csv', 'AutoTFT_Prediction')
+autornn_forecast = load_forecast(f'{output_path}/checkpoints/AutoRNN_AutoRNN_model/AutoRNN_AutoRNN_model_full_forecast.csv', 'AutoRNN_Prediction')
+autoinformer_forecast = load_forecast(f'{output_path}/checkpoints/AutoInformer_AutoInformer_model/AutoInformer_AutoInformer_model_full_forecast.csv', 'AutoInformer_Prediction')
+vanilla_forecast = load_forecast(f'{output_path}/checkpoints/VanillaTransformer_VanillaTransformer_model/VanillaTransformer_VanillaTransformer_model_full_forecast.csv', 'VanillaTransformer_Prediction')
+autobitcn_forecast = load_forecast(f'{output_path}/checkpoints/AutoBiTCN_AutoBiTCN_model/AutoBiTCN_AutoBiTCN_model_full_forecast.csv', 'AutoBiTCN_Prediction')
+autodeepar_forecast = load_forecast(f'{output_path}/checkpoints/AutoDeepAR_AutoDeepAR_model/AutoDeepAR_AutoDeepAR_model_full_forecast.csv', 'AutoDeepAR_Prediction')
+autodilatedrnn_forecast = load_forecast(f'{output_path}/checkpoints/AutoDilatedRNN_AutoDilatedRNN_model/AutoDilatedRNN_AutoDilatedRNN_model_full_forecast.csv', 'AutoDilatedRNN_Prediction')
+autogru_forecast = load_forecast(f'{output_path}/checkpoints/AutoGRU_AutoGRU_model/AutoGRU_AutoGRU_model_full_forecast.csv', 'AutoGRU_Prediction')
+autotcn_forecast = load_forecast(f'{output_path}/checkpoints/AutoTCN_AutoTCN_model/AutoTCN_AutoTCN_model_full_forecast.csv', 'AutoTCN_Prediction')
 
-# Renomear as colunas 'y' para identificar cada modelo
-lstm_forecast = lstm_forecast.rename(columns={'y': 'LSTM_Prediction'})
-autotft_forecast = autotft_forecast.rename(columns={'y': 'AutoTFT_Prediction'})
-autornn_forecast = autornn_forecast.rename(columns={'y': 'AutoRNN_Prediction'})
+# Filtrar previsões carregadas com sucesso para combinar no DataFrame
+forecasts = [df for df in [lstm_forecast, autotft_forecast, autornn_forecast, autoinformer_forecast, vanilla_forecast, autobitcn_forecast, autodeepar_forecast, autodilatedrnn_forecast, autogru_forecast, autotcn_forecast] if df is not None]
 
-# Combinar as previsões dos três modelos na mesma tabela para comparação
-comparison_df = pd.merge(lstm_forecast[['ds', 'LSTM_Prediction']],
-                         autotft_forecast[['ds', 'AutoTFT_Prediction']], on='ds', how='inner')
-comparison_df = pd.merge(comparison_df, autornn_forecast[['ds', 'AutoRNN_Prediction']], on='ds', how='inner')
+# Combinar previsões em um único DataFrame, usando a coluna 'ds' como referência e ignorando colunas duplicadas
+comparison_df = forecasts[0][['ds']].copy()
+for forecast in forecasts:
+    comparison_df = pd.merge(comparison_df, forecast.drop(columns=['unique_id', 'model_name'], errors='ignore'), on='ds', how='inner')
 
 # Exibir a tabela comparativa das previsões para análise
-print("\nTabela comparativa das previsões dos modelos LSTM, AutoTFT e AutoRNN:")
+print("\nTabela comparativa das previsões dos modelos:")
 print(comparison_df.head(20))  # Exibir as primeiras 20 linhas para visualização
 
 # Gráfico de Previsões Comparativas
-plt.figure(figsize=(12, 6))
-plt.plot(comparison_df['ds'], comparison_df['LSTM_Prediction'], label='LSTM Prediction', color='blue')
-plt.plot(comparison_df['ds'], comparison_df['AutoTFT_Prediction'], label='AutoTFT Prediction', color='orange')
-plt.plot(comparison_df['ds'], comparison_df['AutoRNN_Prediction'], label='AutoRNN Prediction', color='green')
+plt.figure(figsize=(14, 8))
+for col in comparison_df.columns[1:]:
+    plt.plot(comparison_df['ds'], comparison_df[col], label=col)
 plt.xlabel('Data')
 plt.ylabel('Previsão')
-plt.title('Comparação das Previsões dos Modelos LSTM, AutoTFT e AutoRNN')
+plt.title('Comparação das Previsões dos Modelos')
 plt.legend()
 plt.grid(True)
 plt.gca().xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
@@ -44,20 +53,40 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
 
-# Gráfico de Métricas dos Modelos
-metrics_df = pd.concat([
-    lstm_metrics.assign(Modelo='LSTM'),
-    autotft_metrics.assign(Modelo='AutoTFT'),
-    autornn_metrics.assign(Modelo='AutoRNN')
-])
+# Carregar arquivos de métricas para cada modelo, se existirem
+def load_metrics(file_path, model_name):
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        df['Modelo'] = model_name
+        return df
+    else:
+        print(f"Arquivo de métricas não encontrado: {file_path}")
+        return None
+
+# Carregar métricas dos modelos
+metrics_dfs = [
+    load_metrics(f'{output_path}/lightning_logs/LSTM_LSTM_model/LSTM_LSTM_model_metrics.csv', 'LSTM'),
+    load_metrics(f'{output_path}/lightning_logs/AutoTFT_AutoTFT_model/AutoTFT_AutoTFT_model_metrics.csv', 'AutoTFT'),
+    load_metrics(f'{output_path}/lightning_logs/AutoRNN_AutoRNN_model/AutoRNN_AutoRNN_model_metrics.csv', 'AutoRNN'),
+    load_metrics(f'{output_path}/lightning_logs/AutoInformer_AutoInformer_model/AutoInformer_AutoInformer_model_metrics.csv', 'AutoInformer'),
+    load_metrics(f'{output_path}/lightning_logs/VanillaTransformer_VanillaTransformer_model/VanillaTransformer_VanillaTransformer_model_metrics.csv', 'VanillaTransformer'),
+    load_metrics(f'{output_path}/lightning_logs/AutoBiTCN_AutoBiTCN_model/AutoBiTCN_AutoBiTCN_model_metrics.csv', 'AutoBiTCN'),
+    load_metrics(f'{output_path}/lightning_logs/AutoDeepAR_AutoDeepAR_model/AutoDeepAR_AutoDeepAR_model_metrics.csv', 'AutoDeepAR'),
+    load_metrics(f'{output_path}/lightning_logs/AutoDilatedRNN_AutoDilatedRNN_model/AutoDilatedRNN_AutoDilatedRNN_model_metrics.csv', 'AutoDilatedRNN'),
+    load_metrics(f'{output_path}/lightning_logs/AutoGRU_AutoGRU_model/AutoGRU_AutoGRU_model_metrics.csv', 'AutoGRU'),
+    load_metrics(f'{output_path}/lightning_logs/AutoTCN_AutoTCN_model/AutoTCN_AutoTCN_model_metrics.csv', 'AutoTCN')
+]
+
+# Filtrar métricas carregadas com sucesso para combinar no DataFrame
+metrics_df = pd.concat([df for df in metrics_dfs if df is not None])
 
 # Configurar o DataFrame para exibir métricas lado a lado
 metrics_df = metrics_df.set_index(['Modelo', 'model_name']).T  # Transpor para facilitar a comparação
 
-# Plot das métricas com rótulos em cada barra
-fig, ax = plt.subplots(figsize=(12, 6))
-metrics_df.plot(kind='bar', ax=ax, color=['blue', 'orange', 'green'])
-plt.title('Comparação das Métricas - Modelos LSTM, AutoTFT e AutoRNN')
+# Gráfico de Métricas dos Modelos com rótulos
+fig, ax = plt.subplots(figsize=(14, 8))
+metrics_df.plot(kind='bar', ax=ax)
+plt.title('Comparação das Métricas - Modelos')
 plt.xlabel('Métricas')
 plt.ylabel('Valores')
 
@@ -65,11 +94,10 @@ plt.ylabel('Valores')
 for p in ax.patches:
     ax.annotate(f'{p.get_height():.2f}',
                 (p.get_x() + p.get_width() / 2, p.get_height()),
-                ha='center', va='bottom', fontsize=10)
+                ha='center', va='bottom', fontsize=8)
 
 plt.xticks(rotation=45)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.legend(title='Modelos')
+plt.legend(title='Modelos', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
-
