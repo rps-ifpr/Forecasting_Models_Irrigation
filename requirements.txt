@@ -1,0 +1,6 @@
+pandas~=1.5.3
+numpy~=1.26.4
+matplotlib~=3.9.2
+neuralforecast~=1.7.5
+ray~=2.38.0
+statsmodels~=0.14.4

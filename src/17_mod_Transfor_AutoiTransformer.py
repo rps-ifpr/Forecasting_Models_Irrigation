@@ -2,8 +2,8 @@ import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from neuralforecast.models import Autoformer
-from neuralforecast.losses.pytorch import MAE
+from neuralforecast.models import iTransformer
+from neuralforecast.losses.pytorch import MSE, MAE
 from neuralforecast.core import NeuralForecast
 from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, medianabs
 import math
@@ -12,11 +12,10 @@ import os
 # Definir a variável de ambiente para suprimir o aviso de `FutureWarning`
 os.environ['NIXTLA_ID_AS_COL'] = '1'
 
+def train_and_predict_itransformer(Y_df, horizon, config, output_path, full_horizon, model_name):
+    """Treina o modelo AutoiTransformer sem variáveis exógenas, salva previsões e métricas nos diretórios especificados."""
 
-def train_and_predict_autoformer(Y_df, horizon, config, output_path, full_horizon, model_name):
-    """Treina o modelo Autoformer sem variáveis exógenas, salva previsões e métricas nos diretórios especificados."""
-
-    applied_model_name = 'Autoformer'
+    applied_model_name = 'iTransformer'
 
     # Diretórios para salvar o modelo e resultados
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
@@ -32,19 +31,25 @@ def train_and_predict_autoformer(Y_df, horizon, config, output_path, full_horizo
 
     # Treinamento do modelo sem variáveis exógenas
     start_time = time.time()
-    model = Autoformer(
+    model = iTransformer(
         h=horizon,
         input_size=config['input_size'],
+        n_series=config['n_series'],
         hidden_size=config['hidden_size'],
-        conv_hidden_size=config['conv_hidden_size'],
-        n_head=config['n_head'],
-        loss=MAE(),
-        scaler_type=config['scaler_type'],
-        learning_rate=config['learning_rate'],
-        max_steps=config['max_steps']
+        n_heads=config['n_heads'],
+        e_layers=config['e_layers'],
+        d_layers=config['d_layers'],
+        d_ff=config['d_ff'],
+        factor=config['factor'],
+        dropout=config['dropout'],
+        use_norm=config['use_norm'],
+        loss=MSE(),
+        valid_loss=MAE(),
+        early_stop_patience_steps=config['early_stop_patience_steps'],
+        batch_size=config['batch_size']
     )
     nf = NeuralForecast(models=[model], freq='H')
-    nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
+    nf.fit(df=Y_df[['unique_id', 'ds', 'y']], val_size=horizon)  # Definindo `val_size` para early stopping
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
     end_time = time.time()
     print(f'Modelo {model_name} treinado em:', end_time - start_time, 'segundos')
@@ -125,24 +130,29 @@ if __name__ == '__main__':
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo Autoformer
+    # Configuração do modelo AutoiTransformer
     config = {
-        "input_size": horizon,
-        "hidden_size": 16,
-        "conv_hidden_size": 32,
-        "n_head": 2,
-        "learning_rate": 1e-3,
-        "scaler_type": 'robust',
-        "max_steps": 500,
+        "input_size": 24,
+        "n_series": 2,
+        "hidden_size": 128,
+        "n_heads": 2,
+        "e_layers": 2,
+        "d_layers": 1,
+        "d_ff": 4,
+        "factor": 1,
+        "dropout": 0.1,
+        "use_norm": True,
+        "early_stop_patience_steps": 3,
+        "batch_size": 32
     }
 
-    model_name = 'Autoformer_model'
-    forecast, metrics = train_and_predict_autoformer(Y_df, horizon, config, output_path, full_horizon, model_name)
+    model_name = 'AutoiTransformer_model'
+    forecast, metrics = train_and_predict_itransformer(Y_df, horizon, config, output_path, full_horizon, model_name)
 
     # Plot comparativo
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo Autoformer
+    # Previsões do modelo AutoiTransformer
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
@@ -163,7 +173,3 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(os.path.join(output_path, f'{model_name}_forecast_plot.png'))
     plt.show()
-
-
-
-

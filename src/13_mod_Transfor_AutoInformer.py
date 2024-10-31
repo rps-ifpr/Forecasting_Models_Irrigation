@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from neuralforecast.models import Informer
 from neuralforecast.losses.pytorch import MAE
 from neuralforecast.core import NeuralForecast
-from neuralforecast.utils import augment_calendar_df
 from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, medianabs
 import math
 import os
@@ -14,8 +13,8 @@ import os
 os.environ['NIXTLA_ID_AS_COL'] = '1'
 
 
-def train_and_predict_informer(Y_df, horizon, config, output_path, full_horizon, model_name):
-    """Treina o modelo Informer, salva previsões e métricas nos diretórios especificados."""
+def train_and_predict_autoinformer(Y_df, horizon, config, output_path, full_horizon, model_name):
+    """Treina o modelo AutoInformer sem variáveis exógenas, salva previsões e métricas nos diretórios especificados."""
 
     applied_model_name = 'Informer'
 
@@ -26,13 +25,12 @@ def train_and_predict_informer(Y_df, horizon, config, output_path, full_horizon,
     os.makedirs(model_output_path, exist_ok=True)
     os.makedirs(log_output_path, exist_ok=True)
 
-    # Aplicar variáveis de calendário ao Y_df para incluir colunas exógenas diretamente
-    Y_df, calendar_cols = augment_calendar_df(df=Y_df, freq='H')
+    # Ajustando DataFrame de entrada
     Y_df['unique_id'] = Y_df['unique_id'].astype(str)
     Y_df['ds'] = pd.to_datetime(Y_df['ds'], errors='coerce')
     Y_df = Y_df.dropna(subset=['ds']).sort_values(by=['unique_id', 'ds']).reset_index(drop=True)
 
-    # Treinamento do modelo
+    # Treinamento do modelo sem variáveis exógenas
     start_time = time.time()
     model = Informer(
         h=horizon,
@@ -41,13 +39,12 @@ def train_and_predict_informer(Y_df, horizon, config, output_path, full_horizon,
         conv_hidden_size=config['conv_hidden_size'],
         n_head=config['n_head'],
         loss=MAE(),
-        futr_exog_list=calendar_cols,
         scaler_type=config['scaler_type'],
         learning_rate=config['learning_rate'],
         max_steps=config['max_steps']
     )
     nf = NeuralForecast(models=[model], freq='H')
-    nf.fit(df=Y_df[['unique_id', 'ds', 'y'] + calendar_cols])
+    nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
     end_time = time.time()
     print(f'Modelo {model_name} treinado em:', end_time - start_time, 'segundos')
@@ -57,15 +54,21 @@ def train_and_predict_informer(Y_df, horizon, config, output_path, full_horizon,
 
     # Previsões de múltiplos passos
     n_predicts = math.ceil(full_horizon / horizon)
-    combined_train = Y_df[['unique_id', 'ds', 'y'] + calendar_cols].copy()  # Incluindo variáveis exógenas
+    combined_train = Y_df[['unique_id', 'ds', 'y']].copy()
     forecasts = []
 
     for _ in range(n_predicts):
         combined_train['unique_id'] = combined_train['unique_id'].astype(str)
 
-        # Usando futr_df para fornecer as variáveis exógenas
-        step_forecast = nf_loaded.predict(df=combined_train[['unique_id', 'ds', 'y']],
-                                          futr_df=combined_train[calendar_cols])
+        # Gerar as datas futuras
+        last_date = combined_train['ds'].max()
+        future_dates = pd.date_range(last_date, periods=horizon + 1, freq='H')[1:]
+        futr_df = pd.DataFrame({
+            'unique_id': combined_train['unique_id'].iloc[0],
+            'ds': future_dates
+        })
+
+        step_forecast = nf_loaded.predict(df=combined_train[['unique_id', 'ds', 'y']], futr_df=futr_df)
 
         # Verificar e adicionar 'unique_id' se estiver ausente
         if 'unique_id' not in step_forecast.columns:
@@ -73,8 +76,7 @@ def train_and_predict_informer(Y_df, horizon, config, output_path, full_horizon,
 
         step_forecast = step_forecast.rename(columns={applied_model_name: 'y'})
         step_forecast['ds'] = pd.to_datetime(step_forecast['ds'], errors='coerce')
-        combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y'] + calendar_cols]],
-                                   ignore_index=True)
+        combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y']]], ignore_index=True)
         forecasts.append(step_forecast)
 
     full_forecast = pd.concat(forecasts, ignore_index=True)
@@ -123,7 +125,7 @@ if __name__ == '__main__':
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo Informer
+    # Configuração do modelo AutoInformer
     config = {
         "input_size": horizon,
         "hidden_size": 16,
@@ -134,13 +136,13 @@ if __name__ == '__main__':
         "max_steps": 500,
     }
 
-    model_name = 'Informer_model'
-    forecast, metrics = train_and_predict_informer(Y_df, horizon, config, output_path, full_horizon, model_name)
+    model_name = 'AutoInformer_model'
+    forecast, metrics = train_and_predict_autoinformer(Y_df, horizon, config, output_path, full_horizon, model_name)
 
     # Plot comparativo
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo Informer
+    # Previsões do modelo AutoInformer
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
@@ -161,4 +163,6 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(os.path.join(output_path, f'{model_name}_forecast_plot.png'))
     plt.show()
+
+
 
