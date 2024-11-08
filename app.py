@@ -1,57 +1,76 @@
 import os
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-# Caminho absoluto para o arquivo CSV
-csv_path = "./src/output/checkpoints/AutoBiTCN_AutoBiTCN_model/AutoBiTCN_AutoBiTCN_model_full_forecast.csv"
+# Pasta com os arquivos CSV
+data_folder = "./data/"
 
-# Verifique se o arquivo existe
-if not os.path.exists(csv_path):
-    raise FileNotFoundError(f"Arquivo não encontrado: {csv_path}")
+# Lista de arquivos a serem analisados
+csv_files = [
+    "iTransformer_AutoiTransformer_model_full_forecast.csv",
+    "PatchTST_AutoPatchTST_model_full_forecast.csv",
+    "FEDformer_AutoFEDformer_model_full_forecast.csv",
+    "Autoformer_Autoformer_model_full_forecast.csv",
+    "Informer_AutoInformer_model_full_forecast.csv",
+    "AutoTFT_AutoTFT_model_full_forecast.csv",
+    "VanillaTransformer_VanillaTransformer_model_full_forecast.csv",
+    "AutoBiTCN_AutoBiTCN_model_full_forecast.csv",
+    "AutoDilatedRNN_AutoDilatedRNN_model_full_forecast.csv",
+    "AutoDeepAR_AutoDeepAR_model_full_forecast.csv",
+    "AutoTCN_AutoTCN_model_full_forecast.csv",
+    "AutoGRU_AutoGRU_model_full_forecast.csv",
+    "AutoRNN_AutoRNN_model_full_forecast.csv",
+    "LSTM_LSTM_model_full_forecast.csv",
+]
 
-# Carregar dados do CSV
-df = pd.read_csv(csv_path)
+# Lista para armazenar dados para comparação
+comparison_data = []
 
-# Converter a coluna 'ds' para datetime
-df['ds'] = pd.to_datetime(df['ds'])
+# Processar cada arquivo individualmente
+for file in csv_files:
+    file_path = os.path.join(data_folder, file)
 
-# Calcular métricas de desempenho
-rmse = np.sqrt(mean_squared_error(df['y'], df['BiTCN']))
-mae = mean_absolute_error(df['y'], df['BiTCN'])
-print(f"RMSE: {rmse:.2f}")
-print(f"MAE: {mae:.2f}")
+    # Verificar se o arquivo existe
+    if not os.path.exists(file_path):
+        print(f"Arquivo não encontrado: {file_path}")
+        continue
 
-# Plotar Previsão vs Observado
-plt.figure(figsize=(10, 6))
-plt.plot(df['ds'], df['y'], label='Valores Reais (y)', marker='o')
-plt.plot(df['ds'], df['BiTCN'], label='Previsão (BiTCN)', linestyle='--')
-plt.fill_between(df['ds'], df['BiTCN-lo-90'], df['BiTCN-hi-90'], color='gray', alpha=0.3, label='Intervalo de Confiança 90%')
-plt.fill_between(df['ds'], df['BiTCN-lo-80'], df['BiTCN-hi-80'], color='blue', alpha=0.2, label='Intervalo de Confiança 80%')
+    # Carregar os dados do CSV
+    df = pd.read_csv(file_path)
+
+    # Certificar-se de que a coluna 'ds' está no formato datetime
+    df['ds'] = pd.to_datetime(df['ds'])
+
+    # Adicionar os dados do modelo
+    model_name = df['model_name'].iloc[0]  # Extrair o nome do modelo
+    comparison_data.append({
+        "Model": model_name,
+        "ds": df['ds'],
+        "y": df['y']
+    })
+
+    # Plotar gráfico individual
+    plt.figure(figsize=(10, 6))
+    plt.plot(df['ds'], df['y'], label=f'Valores Reais ({model_name})', marker='o')
+    plt.xlabel('Data')
+    plt.ylabel('Valores')
+    plt.title(f'Valores Reais ao Longo do Tempo - {model_name}')
+    plt.legend()
+    plt.grid()
+    plt.tight_layout()
+    plt.show()
+
+plt.figure(figsize=(12, 8))
+for data in comparison_data:
+    plt.plot(data["ds"], data["y"], label=f'Valores Reais - {data["Model"]}')
 plt.xlabel('Data')
 plt.ylabel('Valores')
-plt.title('Previsão vs Valores Reais com Intervalos de Confiança')
+plt.title('Comparação de Valores Reais Entre Modelos')
 plt.legend()
 plt.grid()
 plt.tight_layout()
 plt.show()
 
-# Estatísticas descritivas
-print("\nEstatísticas Descritivas das Previsões:")
-print(df[['BiTCN', 'y']].describe())
 
-# Analisar dispersão (resíduos)
-df['residuals'] = df['y'] - df['BiTCN']
-plt.figure(figsize=(10, 6))
-plt.scatter(df['ds'], df['residuals'], label='Resíduos', color='red')
-plt.axhline(0, color='black', linestyle='--')
-plt.xlabel('Data')
-plt.ylabel('Resíduos')
-plt.title('Análise de Resíduos')
-plt.grid()
-plt.legend()
-plt.tight_layout()
-plt.show()
 
 
