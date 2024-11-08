@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Caminho absoluto para o arquivo CSV
-csv_path = r"C:\Users\Usuário\PycharmProjects\Forecasting_Models_Irrigation\output\AutoBiTCN_AutoBiTCN_model_full_forecast.csv"
+csv_path = "./src/output/checkpoints/AutoBiTCN_AutoBiTCN_model/AutoBiTCN_AutoBiTCN_model_full_forecast.csv"
 
 # Verifique se o arquivo existe
 if not os.path.exists(csv_path):
