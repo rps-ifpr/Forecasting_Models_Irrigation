@@ -23,8 +23,9 @@ csv_files = [
     "LSTM_LSTM_model_full_forecast.csv",
 ]
 
-# Lista para armazenar dados para comparação
-comparison_data = []
+comparison_data = []  # Dados para o gráfico de séries temporais
+metrics = []  # Dados para as métricas
+distribution_data = {}  # Dados para o histograma e boxplot
 
 # Processar cada arquivo individualmente
 for file in csv_files:
@@ -37,39 +38,67 @@ for file in csv_files:
 
     # Carregar os dados do CSV
     df = pd.read_csv(file_path)
+    df['ds'] = pd.to_datetime(df['ds'])  # Certificar-se de que a coluna 'ds' está no formato datetime
 
-    # Certificar-se de que a coluna 'ds' está no formato datetime
-    df['ds'] = pd.to_datetime(df['ds'])
+    # Adicionar ao gráfico combinado e coletar dados
+    model_name = df['model_name'].iloc[0]  # Nome do modelo
+    y_values = df['y'].values
+    comparison_data.append({"Model": model_name, "ds": df['ds'], "y": y_values})
 
-    # Adicionar os dados do modelo
-    model_name = df['model_name'].iloc[0]  # Extrair o nome do modelo
-    comparison_data.append({
-        "Model": model_name,
-        "ds": df['ds'],
-        "y": df['y']
-    })
+    # Calcular métricas básicas
+    mean_value = y_values.mean()
+    std_dev = y_values.std()
+    metrics.append({"Model": model_name, "Mean": mean_value, "Std Dev": std_dev})
 
-    # Plotar gráfico individual
-    plt.figure(figsize=(10, 6))
-    plt.plot(df['ds'], df['y'], label=f'Valores Reais ({model_name})', marker='o')
-    plt.xlabel('Data')
-    plt.ylabel('Valores')
-    plt.title(f'Valores Reais ao Longo do Tempo - {model_name}')
-    plt.legend()
-    plt.grid()
-    plt.tight_layout()
-    plt.show()
+    # Adicionar dados para o histograma e boxplot
+    distribution_data[model_name] = y_values
 
+# Criar gráficos
+
+# 1. Gráfico de média e desvio padrão
+metrics_df = pd.DataFrame(metrics)
+plt.figure(figsize=(12, 6))
+plt.bar(metrics_df["Model"], metrics_df["Mean"], yerr=metrics_df["Std Dev"], capsize=5)
+plt.xlabel('Modelos')
+plt.ylabel('Média dos Valores')
+plt.title('Média e Desvio Padrão dos Modelos')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+# 2. Gráfico de séries temporais
 plt.figure(figsize=(12, 8))
 for data in comparison_data:
-    plt.plot(data["ds"], data["y"], label=f'Valores Reais - {data["Model"]}')
+    plt.plot(data["ds"], data["y"], label=data["Model"], marker='o')
 plt.xlabel('Data')
 plt.ylabel('Valores')
-plt.title('Comparação de Valores Reais Entre Modelos')
+plt.title('Comparação de Séries Temporais Entre Modelos')
 plt.legend()
 plt.grid()
 plt.tight_layout()
 plt.show()
+
+# 3. Histograma de distribuição
+plt.figure(figsize=(12, 8))
+for model_name, values in distribution_data.items():
+    plt.hist(values, bins=20, alpha=0.5, label=model_name)
+plt.xlabel('Valores Previstos')
+plt.ylabel('Frequência')
+plt.title('Distribuição dos Valores Previstos por Modelo')
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# 4. Boxplot
+plt.figure(figsize=(12, 8))
+plt.boxplot(distribution_data.values(), labels=distribution_data.keys(), vert=False)
+plt.xlabel('Valores Previstos')
+plt.ylabel('Modelos')
+plt.title('Boxplot dos Valores Previstos por Modelo')
+plt.tight_layout()
+plt.show()
+
+
 
 
 
