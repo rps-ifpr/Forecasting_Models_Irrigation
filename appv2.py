@@ -26,6 +26,7 @@ csv_files = [
 comparison_data = []  # Dados para o gráfico de séries temporais
 metrics = []  # Dados para as métricas
 distribution_data = {}  # Dados para o histograma e boxplot
+cross_validation_metrics = []  # Para métricas de validação cruzada
 
 # Processar cada arquivo individualmente
 for file in csv_files:
@@ -53,10 +54,25 @@ for file in csv_files:
     # Adicionar dados para o histograma e boxplot
     distribution_data[model_name] = y_values
 
-# Criar gráficos
+    # Processar métricas de validação cruzada
+    cv_file_path = os.path.join(data_folder, file.replace("_full_forecast.csv", "_cv_metrics.csv"))
+    if os.path.exists(cv_file_path):
+        cv_metrics_df = pd.read_csv(cv_file_path)
+        mean_rmse = cv_metrics_df['RMSE'].mean()
+        std_rmse = cv_metrics_df['RMSE'].std()
+        cross_validation_metrics.append({
+            "Model": model_name,
+            "Mean RMSE": mean_rmse,
+            "Std RMSE": std_rmse
+        })
+    else:
+        print(f"Resultados de validação cruzada não encontrados para {file}")
+
+# Criar DataFrames de métricas
+metrics_df = pd.DataFrame(metrics)
+cv_metrics_df = pd.DataFrame(cross_validation_metrics)
 
 # 1. Gráfico de média e desvio padrão
-metrics_df = pd.DataFrame(metrics)
 plt.figure(figsize=(12, 6))
 plt.bar(metrics_df["Model"], metrics_df["Mean"], yerr=metrics_df["Std Dev"], capsize=5)
 plt.xlabel('Modelos')
@@ -97,6 +113,35 @@ plt.ylabel('Modelos')
 plt.title('Boxplot dos Valores Previstos por Modelo')
 plt.tight_layout()
 plt.show()
+
+# 5. Gráfico de validação cruzada (Média e Desvio Padrão do RMSE)
+if not cv_metrics_df.empty:
+    plt.figure(figsize=(12, 6))
+    plt.bar(cv_metrics_df["Model"], cv_metrics_df["Mean RMSE"], yerr=cv_metrics_df["Std RMSE"], capsize=5)
+    plt.xlabel('Modelos')
+    plt.ylabel('Média do RMSE (Validação Cruzada)')
+    plt.title('Média e Desvio Padrão do RMSE por Modelo (Validação Cruzada)')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+# 6. Boxplot de RMSE por Modelo (Validação Cruzada)
+fold_results = {}
+for file in csv_files:
+    cv_file_path = os.path.join(data_folder, file.replace("_full_forecast.csv", "_cv_metrics.csv"))
+    if os.path.exists(cv_file_path):
+        cv_metrics_df = pd.read_csv(cv_file_path)
+        model_name = file.split("_")[0]
+        fold_results[model_name] = cv_metrics_df['RMSE']
+
+if fold_results:
+    plt.figure(figsize=(12, 8))
+    plt.boxplot(fold_results.values(), labels=fold_results.keys(), vert=False)
+    plt.xlabel('RMSE')
+    plt.ylabel('Modelos')
+    plt.title('Boxplot do RMSE por Modelo (Validação Cruzada)')
+    plt.tight_layout()
+    plt.show()
 
 
 
