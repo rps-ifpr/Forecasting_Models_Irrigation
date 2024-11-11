@@ -14,7 +14,6 @@ os.environ['NIXTLA_ID_AS_COL'] = '1'
 
 def train_and_predict_itransformer(Y_df, horizon, config, output_path, full_horizon, model_name):
     """Treina o modelo AutoiTransformer e salva previsões e métricas nos diretórios especificados."""
-
     applied_model_name = 'iTransformer'
 
     # Diretórios para salvar o modelo e resultados
@@ -25,15 +24,11 @@ def train_and_predict_itransformer(Y_df, horizon, config, output_path, full_hori
     os.makedirs(log_output_path, exist_ok=True)
 
     # Ajustando DataFrame de entrada
-    print(f"Verificando consistência dos dados para {model_name}...")
-    if not all(col in Y_df.columns for col in ['unique_id', 'ds', 'y']):
-        raise ValueError("O DataFrame de entrada deve conter as colunas: 'unique_id', 'ds', 'y'")
     Y_df['unique_id'] = Y_df['unique_id'].astype(str)
     Y_df['ds'] = pd.to_datetime(Y_df['ds'], errors='coerce')
     Y_df = Y_df.dropna(subset=['ds']).sort_values(by=['unique_id', 'ds']).reset_index(drop=True)
 
     # Treinamento do modelo
-    print(f"Iniciando treinamento do modelo {model_name}...")
     start_time = time.time()
     model = iTransformer(
         h=horizon,
@@ -56,34 +51,21 @@ def train_and_predict_itransformer(Y_df, horizon, config, output_path, full_hori
     nf.fit(df=Y_df[['unique_id', 'ds', 'y']], val_size=horizon)
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
     end_time = time.time()
-    print(f"Treinamento do modelo {model_name} concluído em {end_time - start_time:.2f} segundos.")
 
     # Carregando o modelo treinado para previsão
-    print(f"Carregando o modelo {model_name} salvo...")
     nf_loaded = NeuralForecast.load(path=model_output_path)
 
     # Previsões de múltiplos passos
-    print(f"Gerando previsões para {model_name}...")
     n_predicts = math.ceil(full_horizon / horizon)
     combined_train = Y_df[['unique_id', 'ds', 'y']].copy()
     forecasts = []
 
     for _ in range(n_predicts):
         combined_train['unique_id'] = combined_train['unique_id'].astype(str)
-
-        # Gerar datas futuras
         last_date = combined_train['ds'].max()
         future_dates = pd.date_range(last_date, periods=horizon + 1, freq='H')[1:]
-        futr_df = pd.DataFrame({
-            'unique_id': combined_train['unique_id'].iloc[0],
-            'ds': future_dates
-        })
-
+        futr_df = pd.DataFrame({'unique_id': combined_train['unique_id'].iloc[0], 'ds': future_dates})
         step_forecast = nf_loaded.predict(df=combined_train[['unique_id', 'ds', 'y']], futr_df=futr_df)
-
-        if 'unique_id' not in step_forecast.columns:
-            step_forecast['unique_id'] = combined_train['unique_id'].iloc[0]
-
         step_forecast = step_forecast.rename(columns={applied_model_name: 'y'})
         step_forecast['ds'] = pd.to_datetime(step_forecast['ds'], errors='coerce')
         combined_train = pd.concat([combined_train, step_forecast[['unique_id', 'ds', 'y']]], ignore_index=True)
@@ -95,33 +77,24 @@ def train_and_predict_itransformer(Y_df, horizon, config, output_path, full_hori
     # Salvando previsões
     forecast_output_path = os.path.join(model_output_path, f'{applied_model_name}_{model_name}_full_forecast.csv')
     full_forecast.to_csv(forecast_output_path, index=False)
-    print(f"Previsões salvas em {forecast_output_path}.")
 
     # Calculando métricas
     y_pred = full_forecast['y'].values
     y_true = Y_df['y'].iloc[-len(y_pred):].values
-    rmse_value = rmse(y_true, y_pred)
-    rmspe_value = rmspe(y_true, y_pred)
-    maxabs_value = maxabs(y_true, y_pred)
-    meanabs_value = meanabs(y_true, y_pred)
-    medianabs_value = medianabs(y_true, y_pred)
-
     metrics = {
-        'model_name': model_name,
-        'RMSE': rmse_value,
-        'RMSPE': rmspe_value,
-        'Max Abs Error': maxabs_value,
-        'Mean Abs Error': meanabs_value,
-        'Median Abs Error': medianabs_value
+        'RMSE': rmse(y_true, y_pred),
+        'RMSPE': rmspe(y_true, y_pred),
+        'Max Abs Error': maxabs(y_true, y_pred),
+        'Mean Abs Error': meanabs(y_true, y_pred),
+        'Median Abs Error': medianabs(y_true, y_pred)
     }
 
     # Salvando métricas
     metrics_df = pd.DataFrame([metrics])
-    metrics_df.to_csv(os.path.join(log_output_path, f'{applied_model_name}_{model_name}_metrics.csv'), index=False)
-    print(f"Métricas salvas em {log_output_path}.")
+    metrics_output_path = os.path.join(log_output_path, f'{applied_model_name}_{model_name}_metrics.csv')
+    metrics_df.to_csv(metrics_output_path, index=False)
 
     return full_forecast, metrics
-
 
 if __name__ == '__main__':
     data_path = '../data/data_est_local.csv'
@@ -137,7 +110,7 @@ if __name__ == '__main__':
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo AutoiTransformer
+    # Configuração do modelo
     config = {
         "input_size": 24,
         "n_series": 1,
@@ -159,8 +132,17 @@ if __name__ == '__main__':
     # Visualização
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
-    ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
-    ax1.set_title('Previsão vs Dados Originais')
+    ax1.plot(forecast['ds'], forecast['y'], label='Previsões', color='blue')
     ax1.legend()
-    ax2.bar(metrics.keys(), metrics.values())
+    ax1.set_title('Previsão vs Dados Originais')
+    ax1.set_xlabel('Data')
+    ax1.set_ylabel('Valor')
+
+    ax2.bar(metrics.keys(), [float(v) for v in metrics.values()])
+    ax2.set_title('Métricas do Modelo')
+    ax2.set_xlabel('Métrica')
+    ax2.set_ylabel('Valor')
+
+    plt.tight_layout()
     plt.show()
+

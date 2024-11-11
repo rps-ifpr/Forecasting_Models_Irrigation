@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Pasta com os arquivos CSV
-data_folder = "./data/"
+data_folder = "./data/v1"
 
 # Lista de arquivos a serem analisados
 csv_files = [
