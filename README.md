@@ -1,4 +1,4 @@
-# Forecasting Models Irrigation
+# Transformer Models and Recurrent Neural Networks Applied to Meteorological Data with NeuralForecast
 ![](https://i.imgur.com/jYDN7PL.png)
 
 <p align="center">
@@ -21,8 +21,8 @@
 </h4>
 
 <p align="center">
-	<img alt="Status Em Desenvolvimento" src="https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-green">
-	<!-- <img alt="Status Concluído" src="https://img.shields.io/badge/STATUS-CONCLU%C3%8DDO-brightgreen">  -->
+	<!--<img alt="Status Em Desenvolvimento" src="https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-green"> -->
+	<img alt="Status Concluído" src="https://img.shields.io/badge/STATUS-CONCLU%C3%8DDO-brightgreen">  
 </p>
 
 <p align="center">
@@ -36,103 +36,69 @@
  <a href="#user-content--licença">Licença</a>
 </p>
 
-
 ## 💻 Sobre o projeto
 
-📄 Academy Template README Projects - é o modelo oficial de README de projetos da Cubos Academy.
+Com o aumento da demanda por previsões meteorológicas precisas, este projeto explora o uso de redes neurais, especialmente modelos Transformer e RNN, para capturar padrões complexos em séries temporais meteorológicas. Foram avaliados 14 modelos com a biblioteca [NeuralForecast](https://github.com/Nixtla/neuralforecast), utilizando métricas como RMSE, RMSPE, Max Abs Error, Mean Abs Error e Median Abs Error.
 
-
-Projeto desenvolvido durante a **[Turma | Evento]** de [ [Desenvolvimento de Software](https://cubos.academy/cursos/desenvolvimento-de-software-v2) | [On Demand](https://cubos.academy/cubosondemand) ] oferecida pela [Cubos Academy](https://cubos.academy/).
-
-A Cubos Academy é uma escola com cursos de tecnologia para todos os perfis, do iniciante ao avançado.
-
----
 
 ## ⚙️ Funcionalidades
+- Avaliação de 14 modelos de redes neurais aplicados à previsão de séries temporais meteorológicas:
+  - **Modelos baseados em Transformer:**
+    - AutoInformer
+    - Autoformer
+    - PatchTST
+    - FEDformer
+    - VanillaTransformer
+    - iTransformer
+  - **Modelos baseados em RNN:**
+    - AutoRNN
+    - LSTM
+    - GRU
+    - AutoTCN
+    - AutoDeepAR
+    - AutoDilatedRNN
+    - AutoBiTCN
 
-- [x] Funcionalidade 1:
-  - [x] Entidade 1
-  - [x] Entidade 2
-  - [x] Entidade 3
-  - [x] Entidade 4: 
-    - Item 1
-    - Item 2
+- Utilização de dados meteorológicos reais, coletados de estações locais, com medições horárias no período de um ano (2023).
+- Comparação de desempenho dos modelos utilizando múltiplas métricas de erro:
+  - RMSE (Root Mean Squared Error)
+  - RMSPE (Root Mean Squared Percentage Error)
+  - Max Abs Error (Erro Máximo Absoluto)
+  - Mean Abs Error (Erro Médio Absoluto)
+  - Median Abs Error (Erro Absoluto Mediano)
 
-- [x] Funcionalidade 1:
-  - [x] Entidade 1
-  - [x] Entidade 2
+- Configuração e ajuste automático de hiperparâmetros:
+  - Utilização de validação cruzada e técnica de *early stopping*.
+  - Suporte a variáveis exógenas para melhorar a precisão preditiva.
 
----
+- Implementação de previsões de curto, médio e longo prazo:
+  - Previsão recursiva (utilizando previsões anteriores como entradas).
+  - Previsão direta (geração de todos os passos do horizonte de uma única vez).
 
-## 🎨 Layout
+- Visualização e análise dos resultados:
+  - Gráficos comparativos de métricas de desempenho entre os modelos.
+  - Análise detalhada das previsões e padrões sazonais capturados pelos modelos.
 
-O layout da aplicação está disponível no Figma:
+- Armazenamento e organização dos resultados:
+  - Modelos treinados e logs de validação armazenados nos diretórios `checkpoints` e `lightning_logs`.
+  - Código e resultados disponibilizados no repositório GitHub para transparência e reprodutibilidade.
 
-<a href="https://www.figma.com/files/project/77994470/%F0%9F%93%84-Templates-para-Projetos%2C-Eventos-e-Cursos?fuid=1110596132085818429">
-  <img alt="Made by Cubos Academy" src="https://img.shields.io/badge/Acessar%20Layout%20-Figma-%2304D361">
-</a>
-
-
-### Mobile
-
-<p align="center">
-  <img alt="Nome do Projeto" title="Nome do Projeto" src="assets/LightModeMobile.png" width="200px">
-
-  <img alt="Nome do Projeto" title="Nome do Projeto" src="assets/DarkModeMobile.png" width="200px">
-</p>
-
-### Web
-
-<p align="center" style="display: flex; align-items: flex-start; justify-content: center;">
-  <img alt="Nome do Projeto" title="Nome do Projeto" src="assets/LightMode.png" width="400px">
-
-  <img alt="Nome do Projeto" title="Nome do Projeto" src="assets/DarkMode.png" width="400px">
-</p>
-
----
 
 ## 🛣️ Como executar o projeto
 
-Este projeto é divido em três partes:
-1. Backend (pasta server) 
-2. Frontend (pasta web)
-3. Mobile (pasta mobile)
-
-💡Tanto o Frontend quanto o Mobile precisam que o Backend esteja sendo executado para funcionar.
-
 ### Pré-requisitos
 
-Antes de começar, você vai precisar ter instalado em sua máquina as seguintes ferramentas:
-[Git](https://git-scm.com), [Node.js](https://nodejs.org/en/). 
-Além disto é bom ter um editor para trabalhar com o código como [VSCode](https://code.visualstudio.com/)
+Antes de começar, você precisa ter instalado:
+- [Python 3.13](https://www.python.org/downloads/)
+- Bibliotecas específicas: Veja o arquivo `requirements.txt` no repositório.
 
-#### 🎲 Rodando o Backend (servidor)
+### Execução
 
-```bash
+1. Clone este repositório:
+   ```bash
+   git clone https://github.com/rps-ifpr/Forecasting_Models_Irrigation.git
 
-# Clone este repositório
-$ git clone git@github.com:cubos-academy/academy-template-readme-projects.git
-
-# Acesse a pasta do projeto no terminal/cmd
-$ cd academy-template-readme-projects
-
-# Vá para a pasta server
-$ cd server
-
-# Instale as dependências
-$ npm install
-
-# Execute a aplicação em modo de desenvolvimento
-$ npm run dev:server
-
-# O servidor inciará na porta:3333 - acesse http://localhost:3333 
-
-```
-<p align="center">
-  <a href="https://github.com/cubos-academy/academy-template-readme-projects" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
-</p>
-
-
+   
 #### 🧭 Rodando a aplicação web (Frontend)
 
 ```bash
