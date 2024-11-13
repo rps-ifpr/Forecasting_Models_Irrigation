@@ -98,112 +98,43 @@ Antes de começar, você precisa ter instalado:
    ```bash
    git clone https://github.com/rps-ifpr/Forecasting_Models_Irrigation.git
 
-   
-#### 🧭 Rodando a aplicação web (Frontend)
-
-```bash
-
-# Clone este repositório
-$ git clone git@github.com:cubos-academy/academy-template-readme-projects.git
-
-# Acesse a pasta do projeto no seu terminal/cmd
-$ cd academy-template-readme-projects
-
-# Vá para a pasta da aplicação Front End
-$ cd web
-
-# Instale as dependências
-$ npm install
-
-# Execute a aplicação em modo de desenvolvimento
-$ npm run start
-
-# A aplicação será aberta na porta:3000 - acesse http://localhost:3000
-
-```
-
----
-
 ## 🛠 Tecnologias
 
-As seguintes ferramentas foram usadas na construção do projeto:
+O projeto foi desenvolvido utilizando as seguintes tecnologias e ferramentas:
 
-#### **Website**  ([React](https://reactjs.org/)  +  [TypeScript](https://www.typescriptlang.org/))
+- **Linguagem:** Python 3.13
+- **Bibliotecas:**
+  - **[NeuralForecast](https://github.com/Nixtla/neuralforecast):** Ferramenta avançada para previsão de séries temporais com suporte a modelos baseados em Redes Neurais (Transformers e RNNs).
+  - **[PyTorch](https://pytorch.org/):** Framework de aprendizado de máquina, utilizado para implementar e treinar os modelos.
+  - **[Pandas](https://pandas.pydata.org/):** Biblioteca para manipulação e análise de dados.
+  - **[Matplotlib](https://matplotlib.org/):** Biblioteca para visualização de dados e geração de gráficos comparativos.
+- **Recursos adicionais:**
+  - **Configuração automática de hiperparâmetros:** utilizando técnicas como `early stopping` e validação cruzada.
+  - **Suporte a variáveis exógenas:** integração de dados externos para enriquecer as previsões.
 
--   **[React Icons](https://react-icons.github.io/react-icons/)**
--   **[Axios](https://github.com/axios/axios)**
+## 🧑‍💻 Autor
 
-> Veja o arquivo  [package.json](https://github.com/cubos-academy/academy-template-readme-projects/blob/master/web/package.json)
+Este projeto foi desenvolvido por **Rogério Pereira dos Santos**, pesquisador e desenvolvedor com foco em redes neurais aplicadas à previsão de séries temporais meteorológicas.
 
-#### [](https://github.com/cubos-academy/academy-template-readme-projects#server-nodejs--typescript)**Server**  ([NodeJS](https://nodejs.org/en/)  +  [TypeScript](https://www.typescriptlang.org/))
+- **Instituição:** Instituto Federal do Paraná (IFPR)
+- **Contato:**
+  - [LinkedIn](https://www.linkedin.com/in/rogerio-dosantos) — Conecte-se para discutir sobre redes neurais e projetos de previsão climática.
+  - [Email](mailto:rogerio.dosantos@ifpr.edu.br) — Para dúvidas ou colaborações relacionadas ao projeto.
+- **Publicações e Contribuições:**
+  - Publicações acadêmicas em previsão climática e machine learning.
+  - Experiência com tecnologias aplicadas à agricultura de precisão e sustentabilidade.
 
--   **[Express](https://expressjs.com/)**
--   **[CORS](https://expressjs.com/en/resources/middleware/cors.html)**
--   **[KnexJS](http://knexjs.org/)**
--   **[SQLite](https://github.com/mapbox/node-sqlite3)**
--   **[ts-node](https://github.com/TypeStrong/ts-node)**
--   **[dotENV](https://github.com/motdotla/dotenv)**
-
-> Veja o arquivo  [package.json](https://github.com/cubos-academy/academy-template-readme-projects/blob/master/web/package.json)
-
-#### [](https://github.com/cubos-academy/academy-template-readme-projects#mobile-flutter--typescript)**Mobile**  ([Flutter](https://flutter.dev/)  +  [TypeScript](https://www.typescriptlang.org/))
-
--   **[Flutter](https://flutter.dev/)**
-
-> Veja o arquivo  [package.json](https://github.com/cubos-academy/academy-template-readme-projects/blob/master/mobile/package.json)
-
-#### [](https://github.com/cubos-academy/academy-template-readme-projects#utilit%C3%A1rios)**Utilitários**
-
--   Protótipo:  **[Figma](https://www.figma.com/)**  →  **[Protótipo](https://www.figma.com/file/L4O2dxZzKKhEPspDgxzZ3a/Template-de-Capa-para-Projetos?type=design&node-id=0%3A1&t=zpQ8tnlNEfQtMeC8-1)**
--   API:  **[API](Link da API)**
--   Editor:  **[Visual Studio Code](https://code.visualstudio.com/)**  → Extensions:  **[SQLite](https://marketplace.visualstudio.com/items?itemName=alexcvzz.vscode-sqlite)**
--   Markdown:  **[StackEdit](https://stackedit.io/)**,  **[Markdown Emoji](https://gist.github.com/rxaviers/7360908)**
--   Commit Conventional:  **[Commitlint](https://github.com/conventional-changelog/commitlint)**
--   Teste de API:  **[Insomnia](https://insomnia.rest/)**
--   Ícones:  **[Feather Icons](https://feathericons.com/)**,  **[Font Awesome](https://fontawesome.com/)**
--   Fontes:  **[Ubuntu](https://fonts.google.com/specimen/Ubuntu)**,  **[Roboto](https://fonts.google.com/specimen/Roboto)**
-
-
----
-
-## 👨‍💻 Contribuidores
-
-Um praise para os cúbicos que contribuíram neste projeto 👏
-
-<table>
-  <tr>
-    <td align="center"><a href="https://cubos.academy/"><img style="border-radius: 50%;" src="https://ca.slack-edge.com/T02BJRAJH6G-U02BMJ98N68-5e47f31c2a79-512" width="100px;" alt=""/><br /><sub><b>Guido Cerqueira</b></sub></a><br /><a href="https://cubos.academy/" title="Cubos Academy">👨‍💻</a></td>
-    <td align="center"><a href="https://cubos.academy/"><img style="border-radius: 50%;" src="https://media.licdn.com/dms/image/D4E03AQG_0i4C04YeYg/profile-displayphoto-shrink_200_200/0/1677773908684?e=1688601600&v=beta&t=D1aefI0DMhoc7NZFvKUMn_LAIGEyEczyFaxUz0Auh6o" width="100px;" alt=""/><br /><sub><b>Daniel Lopes</b></sub></a><br /><a href="https://cubos.academy/" title="Cubos Academy">👨‍💻</a></td>
-    <td align="center"><a href="https://cubos.academy/"><img style="border-radius: 50%;" src="https://media.licdn.com/dms/image/C4E03AQG1l_n_4-Bhsg/profile-displayphoto-shrink_200_200/0/1516624005627?e=1688601600&v=beta&t=5nA_EezcbJ068eNefrWeccM-FBUUBnmKWQ7frFCxG9U" width="100px;" alt=""/><br /><sub><b>Guilherme Bernal</b></sub></a><br /><a href="https://cubos.academy/" title="Cubos Academy">👨‍💻</a></td>
-	 <td align="center"><a href="https://cubos.academy/"><img style="border-radius: 50%;" src="https://media.licdn.com/dms/image/C4E03AQGp3BsgWtthBg/profile-displayphoto-shrink_200_200/0/1643505110642?e=1688601600&v=beta&t=c_h3BkUr6POLelref_Nzc6AqzJpWTgENueNs9KqmvRM" width="100px;" alt=""/><br /><sub><b>Clara Battesini</b></sub></a><br /><a href="https://cubos.academy/" title="Cubos Academy">👩‍💻</a></td>
-    
-    
-  </tr>
-</table>
+Sinta-se à vontade para entrar em contato ou explorar os demais projetos no [GitHub](https://github.com/rps-ifpr).
 
 ## 💪 Como contribuir para o projeto
-
 1. Faça um **fork** do projeto.
 2. Crie uma nova branch com as suas alterações: `git checkout -b my-feature`
 3. Salve as alterações e crie uma mensagem de commit contando o que você fez: `git commit -m "feature: My new feature"`
 4. Envie as suas alterações: `git push origin my-feature`
 > Caso tenha alguma dúvida confira este [guia de como contribuir no GitHub](./CONTRIBUTING.md)
 
----
-
-## 🧙‍♂️ Autor
-
-<a href="https://www.figma.com/@caiux">
- <img style="border-radius: 50%;" src="https://media.licdn.com/dms/image/D4D03AQEDfulqSVXZqw/profile-displayphoto-shrink_200_200/0/1674667231041?e=1688601600&v=beta&t=C-f9fp3xJDwXm1u4c6eMwpWfVIyW0eCTDAKGIyNdRJA" width="100px;" alt=""/>
- <br />
- <sub><b>Caio Lopes</b></sub></a> <a href="https://www.figma.com/@caiux" title="Cubos Academy">✨</a>
- <br />
-
----
 
 ## 📝 Licença
-
 <!-- Este projeto esta sobe a licença [MIT](./LICENSE). -->
 
-Feito com ❤️ por Caio Lopes 👋🏽 [Entre em contato!](https://www.linkedin.com/in/caiovslopes/)
 
