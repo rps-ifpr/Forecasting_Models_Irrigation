@@ -40,6 +40,74 @@
 
 Com o aumento da demanda por previsões meteorológicas precisas, este projeto explora o uso de redes neurais, especialmente modelos Transformer e RNN, para capturar padrões complexos em séries temporais meteorológicas. Foram avaliados 14 modelos com a biblioteca [NeuralForecast](https://github.com/Nixtla/neuralforecast), utilizando métricas como RMSE, RMSPE, Max Abs Error, Mean Abs Error e Median Abs Error.
 
+A estrutura do projeto é organizada conforme descrito abaixo.
+
+## Estrutura de Diretórios Versão 1
+
+```plaintext
+.
+├── .venv/                   # Ambiente virtual Python
+├── data/                    # Dados brutos e processados
+├── img/                     # Imagens geradas durante a execução dos modelos
+├── src/                     # Código-fonte principal
+│   └── output/              # Scripts e saídas dos modelos
+│       ├── 01_model.py                      # Script base do modelo inicial
+│       ├── 02_train_model.py                # Script de treinamento do modelo
+│       ├── 03_predict_test_data.py          # Previsão com dados de teste
+│       ├── 04_mod_Transfor_TFT.py           # Modelo Temporal Fusion Transformer (TFT)
+│       ├── 05_mod_RNN_AutoRNN.py            # Modelo RNN com automação
+│       ├── 06_mod_RNN_AutoLSTM.py           # Modelo LSTM com automação
+│       ├── 07_mod_RNN_AutoGRU.py            # Modelo GRU com automação
+│       ├── 08_mod_RNN_AutoTCN.py            # Modelo TCN (Temporal Convolutional Network)
+│       ├── 09_mod_RNN_DeepAR.py             # Modelo DeepAR
+│       ├── 10_mod_RNN_AutoDilatedRNN.py     # Modelo RNN com dilatação
+│       ├── 11_mod_RNN_AutoBiTCN.py          # Modelo BiTCN
+│       ├── 12_mod_Transfor_AutoVanilla.py   # Modelo Transformer Vanilla
+│       ├── 13_mod_Transfor_AutoInformer.py  # Modelo Informer
+│       ├── 14_mod_Transfor_Autoformer.py    # Modelo Autoformer
+│       ├── 15_mod_Transfor_AutoFEDformer.py # Modelo FEDformer
+│       ├── 16_mod_Transfor_AutoPatchTST.py  # Modelo PatchTST
+│       ├── 17_mod_Transfor_AutoTransformer.py # Modelo Transformer genérico
+│       ├── app_plot_result_checkpoints.py   # Script para visualização de checkpoints
+│       ├── app_plot_result_light.py         # Script para visualização de resultados simplificados
+│       └── model_metrics_summary.csv        # Resumo das métricas dos modelos
+
+Esta é a segunda versão do projeto, com melhorias significativas em relação à primeira. A principal diferença é a implementação completa da validação cruzada para todos os modelos, além de outras mudanças estruturais.
+
+## Estrutura de Diretórios da Versão 2
+
+```plaintext
+.
+├── src_v2/                       # Código-fonte atualizado
+│   ├── lightning_logs/           # Logs de treinamento e validação dos modelos
+│   └── output/                   # Scripts e saídas dos modelos
+│       ├── app4.py               # Modelo 4 atualizado
+│       ├── app5.py               # Modelo 5 atualizado
+│       ├── app6.py               # Modelo 6 atualizado
+│       ├── app7.py               # Modelo 7 atualizado
+│       ├── app8.py               # Modelo 8 atualizado
+│       ├── app9.py               # Modelo 9 atualizado
+│       ├── app10.py              # Modelo 10 atualizado
+│       ├── app11.py              # Modelo 11 atualizado
+│       ├── app12.py              # Modelo 12 atualizado
+│       ├── app13.py              # Modelo 13 atualizado
+│       ├── app14.py              # Modelo 14 atualizado
+│       ├── app15.py              # Modelo 15 atualizado
+│       ├── app16.py              # Modelo 16 atualizado
+│       ├── app17.py              # Modelo 17 atualizado
+│       ├── app_plot_result_checkpoints.py # Visualização dos checkpoints
+│       ├── app_plot_result_light.py       # Visualização simplificada dos resultados
+│       ├── appv2-1.py             # Script principal para execução conjunta
+│       └── consolidated_model_metrics.csv # Resumo consolidado das métricas
+│       ├── myplot_app4.png        # Gráfico gerado para app4
+│       ├── myplot_app5.png        # Gráfico gerado para app5
+│       ├── myplot_app6.png        # Gráfico gerado para app6
+│       ├── myplot_app7.png        # Gráfico gerado para app7
+│       ├── myplot_app8.png        # Gráfico gerado para app8
+│       ├── myplot_app9.png        # Gráfico gerado para app9
+│       ├── myplot_app10.png       # Gráfico gerado para app10
+│       ├── myplot_app11.png       # Gráfico gerado para app11
+│       ├── myplot_app12.png       # Gráfico gerado para app12
 
 ## ⚙️ Funcionalidades
 - Avaliação de 14 modelos de redes neurais aplicados à previsão de séries temporais meteorológicas:
