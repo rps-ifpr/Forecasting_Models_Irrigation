@@ -1,0 +1,5 @@
+process,duration_sec
+Data Loading,0.0698235034942627
+Model Training,1281.0702464580536
+Prediction,1.8801774978637695
+Metrics Calculation,0.011737585067749023

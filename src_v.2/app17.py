@@ -51,6 +51,7 @@ def train_and_predict_itransformer(Y_df, horizon, config, output_path, full_hori
     nf.fit(df=Y_df[['unique_id', 'ds', 'y']], val_size=horizon)
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
     end_time = time.time()
+    print(f"Modelo {model_name} treinado em: {end_time - start_time:.2f} segundos")
 
     # Carregando o modelo treinado para previsão
     nf_loaded = NeuralForecast.load(path=model_output_path)

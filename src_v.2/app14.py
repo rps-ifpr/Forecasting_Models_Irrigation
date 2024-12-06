@@ -33,6 +33,8 @@ def train_and_predict_autoformer(Y_df, horizon, config, output_path, full_horizo
 
     # Validação cruzada
     print(f"Iniciando treinamento do modelo: {model_name} com validação cruzada...")
+    start_time = time.time()  # Captura o tempo de início do treinamento
+
     tscv = TimeSeriesSplit(n_splits=3)
     for train_index, test_index in tscv.split(Y_df):
         train_data = Y_df.iloc[train_index]
@@ -54,6 +56,8 @@ def train_and_predict_autoformer(Y_df, horizon, config, output_path, full_horizo
 
     # Salvando modelo treinado
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
+    end_time = time.time()  # Captura o tempo de término do treinamento
+    print(f"Modelo {model_name} treinado em: {end_time - start_time:.2f} segundos")
     print(f"Modelo {model_name} salvo em: {model_output_path}")
 
     # Previsões

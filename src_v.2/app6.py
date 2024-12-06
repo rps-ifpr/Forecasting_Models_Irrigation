@@ -23,6 +23,7 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
 
     # Validação cruzada
     print(f"Iniciando treinamento do modelo: {model_name} com validação cruzada...")
+    start_time = time.time()  # Captura o tempo de início do treinamento
     try:
         tscv = TimeSeriesSplit(n_splits=3)
         for train_index, test_index in tscv.split(Y_df):
@@ -61,6 +62,9 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
         nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
 
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
+    end_time = time.time()  # Captura o tempo de término do treinamento
+    print(f"Modelo {model_name} treinado em: {end_time - start_time:.2f} segundos")
+
     print(f"Modelo {model_name} salvo com sucesso!")
 
     # Previsões
