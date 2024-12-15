@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # Dados
-models = ['Autoformer', 'AutoBiTCN', 'AutoDeepAR', 'AutoDilatedRNN', 'AutoGRU', 'AutoInformer', 'AutoRNN', 'AutoTCN', 'AutoTFT', 'FEDformer', 'Informer', 'LSTM', 'PatchTST', 'VanillaTransformer']
+models = ['Autoformer', 'BiTCN', 'DeepAR', 'DilatedRNN', 'GRU', 'Informer', 'RNN', 'TCN', 'TFT', 'FEDformer', 'Informer', 'LSTM', 'PatchTST', 'VanillaT_former']
 metrics = ['RMSE', 'RMSPE', 'MaxAbsE', 'MeanAbsE', 'MedianAbsE']
 data = np.array([
     [1.93, 0.84, 3.29, 1.69, 1.44],
