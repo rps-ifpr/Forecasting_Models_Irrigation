@@ -5,20 +5,20 @@ import matplotlib.pyplot as plt
 data_folder = "./data/v2"
 
 csv_files = [
-    "iTransformer_AutoiTransformer_model_full_forecast.csv",
-    "PatchTST_AutoPatchTST_model_full_forecast.csv",
-    "FEDformer_AutoFEDformer_model_full_forecast.csv",
-    "Autoformer_Autoformer_model_full_forecast.csv",
-    "Informer_AutoInformer_model_full_forecast.csv",
-    "AutoTFT_AutoTFT_model_full_forecast.csv",
-    "VanillaTransformer_VanillaTransformer_model_full_forecast.csv",
-    "AutoBiTCN_AutoBiTCN_model_full_forecast.csv",
-    "AutoDilatedRNN_AutoDilatedRNN_model_full_forecast.csv",
-    "AutoDeepAR_AutoDeepAR_model_full_forecast.csv",
-    "AutoTCN_AutoTCN_model_full_forecast.csv",
-    "AutoGRU_AutoGRU_model_full_forecast.csv",
-    "AutoRNN_AutoRNN_model_full_forecast.csv",
-    "LSTM_LSTM_model_full_forecast.csv",
+    "iTransformer_model_full_forecast.csv",
+    "PatchTST_model_full_forecast.csv",
+    "FEDformer_model_full_forecast.csv",
+    "Autoformer_model_full_forecast.csv",
+    "Informer_model_full_forecast.csv",
+    "TFT_model_full_forecast.csv",
+    "VanillaTransformer_model_full_forecast.csv",
+    "BiTCN_model_full_forecast.csv",
+    "DilatedRNN_model_full_forecast.csv",
+    "DeepAR_model_full_forecast.csv",
+    "TCN_model_full_forecast.csv",
+    "GRU_model_full_forecast.csv",
+    "RNN_model_full_forecast.csv",
+    "LSTM_model_full_forecast.csv",
 ]
 
 comparison_data = []
@@ -36,7 +36,9 @@ for file in csv_files:
     df = pd.read_csv(file_path)
     df['ds'] = pd.to_datetime(df['ds'])
 
-    model_name = df['model_name'].iloc[0]
+    # Extracting model name directly from the file name without file extension
+    model_name = file.replace("_model_full_forecast.csv", "")
+
     y_values = df['y'].values
     comparison_data.append({"Model": model_name, "ds": df['ds'], "y": y_values})
 
@@ -46,7 +48,7 @@ for file in csv_files:
 
     distribution_data[model_name] = y_values
 
-    cv_file_path = os.path.join(data_folder, file.replace("_full_forecast.csv", "_cv_metrics.csv"))
+    cv_file_path = os.path.join(data_folder, file.replace("_model_full_forecast.csv", "_cv_metrics.csv"))
     if os.path.exists(cv_file_path):
         cv_metrics_df = pd.read_csv(cv_file_path)
         mean_rmse = cv_metrics_df['RMSE'].mean()
@@ -112,10 +114,10 @@ if not cv_metrics_df.empty:
 
 fold_results = {}
 for file in csv_files:
-    cv_file_path = os.path.join(data_folder, file.replace("_full_forecast.csv", "_cv_metrics.csv"))
+    cv_file_path = os.path.join(data_folder, file.replace("_model_full_forecast.csv", "_cv_metrics.csv"))
     if os.path.exists(cv_file_path):
         cv_metrics_df = pd.read_csv(cv_file_path)
-        model_name = file.split("_")[0]
+        model_name = file.replace("_model_full_forecast.csv", "")
         fold_results[model_name] = cv_metrics_df['RMSE']
 
 if fold_results:
