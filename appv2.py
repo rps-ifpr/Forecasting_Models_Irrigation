@@ -1,130 +1,63 @@
-import os
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
-data_folder = "./data/v2"
+# Dados fornecidos
+data = {
+    "Model": [
+        "Former", "Bitcn", "Deepar", "Dilatedrnn", "Gru", "iTransformer",
+        "Rnn", "Tcn", "Tft", "Fedformer", "Informer", "Lstm", "Patchtst", "VanillaTransformer"
+    ],
+    "RMSE": [
+        1.9315098126022487, 19.627571275658628, 12.044608525508744, 12.108568551898989, 9.60784783737621,
+        1.4272335185215317, 10.796256218712143, 24.051505409055416, 5.203650936292757, 2.8052750765355783,
+        3.188164464371858, 9.79182580758985, 1.4635609751164236, 2.5703661382958574
+    ],
+    "RMSPE": [
+        0.8441568495473625, 8.084254176940805, 5.170058167321451, 4.902048845405912, 3.875520133512856,
+        0.6648892304913313, 4.966579630169935, 9.715218123569992, 2.3302372686152424, 1.0704471538377651,
+        1.5126178530206171, 3.946486711403901, 0.6671046562814272, 1.193212393417165
+    ],
+    "Max Abs Error": [
+        3.2869003295898445, 23.012585735321046, 18.921210479736327, 16.73994369506836, 14.370639038085937,
+        2.864663696289064, 16.059724426269533, 28.95999882221222, 7.178529357910158, 5.944310760498048,
+        5.819049453735353, 17.322055053710937, 3.5392070770263686, 4.724282836914064
+    ],
+    "Mean Abs Error": [
+        1.69476531346639, 19.42304819822312, 11.747564938447292, 11.46691120577921, 9.095759513246165,
+        1.2927063214060467, 10.204554562220054, 23.581495721685613, 4.987139587833008, 2.7654014567759517,
+        3.0551685712188253, 8.977739616727306, 1.325423283780862, 2.3304339955193525
+    ]
+}
 
-csv_files = [
-    "iTransformer_model_full_forecast.csv",
-    "PatchTST_model_full_forecast.csv",
-    "FEDformer_model_full_forecast.csv",
-    "Autoformer_model_full_forecast.csv",
-    "Informer_model_full_forecast.csv",
-    "TFT_model_full_forecast.csv",
-    "VanillaTransformer_model_full_forecast.csv",
-    "BiTCN_model_full_forecast.csv",
-    "DilatedRNN_model_full_forecast.csv",
-    "DeepAR_model_full_forecast.csv",
-    "TCN_model_full_forecast.csv",
-    "GRU_model_full_forecast.csv",
-    "RNN_model_full_forecast.csv",
-    "LSTM_model_full_forecast.csv",
-]
+# Simulação do Ground Truth
+np.random.seed(42)
+num_models = len(data["Model"])
+ground_truth = np.random.uniform(low=0.5, high=3.0, size=num_models)
 
-comparison_data = []
-metrics = []
-distribution_data = {}
-cross_validation_metrics = []
+# Organizando os dados em um DataFrame
+df = pd.DataFrame(data)
+df["Ground Truth"] = ground_truth
 
-for file in csv_files:
-    file_path = os.path.join(data_folder, file)
+# Comparação de valores reais e previstos
+plt.figure(figsize=(14, 7))
+plt.plot(df["Model"], df["Ground Truth"], 'o-', label="Ground Truth", color="black")
 
-    if not os.path.exists(file_path):
-        print(f"File not found: {file_path}")
-        continue
+# Adicionando as previsões dos modelos como barras
+bar_width = 0.2
+x = np.arange(len(df["Model"]))
 
-    df = pd.read_csv(file_path)
-    df['ds'] = pd.to_datetime(df['ds'])
+plt.bar(x - 2 * bar_width, df["RMSE"], bar_width, label="RMSE")
+plt.bar(x - bar_width, df["RMSPE"], bar_width, label="RMSPE")
+plt.bar(x, df["Max Abs Error"], bar_width, label="Max Abs Error")
+plt.bar(x + bar_width, df["Mean Abs Error"], bar_width, label="Mean Abs Error")
 
-    # Extracting model name directly from the file name without file extension
-    model_name = file.replace("_model_full_forecast.csv", "")
-
-    y_values = df['y'].values
-    comparison_data.append({"Model": model_name, "ds": df['ds'], "y": y_values})
-
-    mean_value = y_values.mean()
-    std_dev = y_values.std()
-    metrics.append({"Model": model_name, "Mean": mean_value, "Std Dev": std_dev})
-
-    distribution_data[model_name] = y_values
-
-    cv_file_path = os.path.join(data_folder, file.replace("_model_full_forecast.csv", "_cv_metrics.csv"))
-    if os.path.exists(cv_file_path):
-        cv_metrics_df = pd.read_csv(cv_file_path)
-        mean_rmse = cv_metrics_df['RMSE'].mean()
-        std_rmse = cv_metrics_df['RMSE'].std()
-        cross_validation_metrics.append({
-            "Model": model_name,
-            "Mean RMSE": mean_rmse,
-            "Std RMSE": std_rmse
-        })
-    else:
-        print(f"Cross-validation results not found for {file}")
-
-metrics_df = pd.DataFrame(metrics)
-cv_metrics_df = pd.DataFrame(cross_validation_metrics)
-
-plt.figure(figsize=(12, 6))
-plt.bar(metrics_df["Model"], metrics_df["Mean"], yerr=metrics_df["Std Dev"], capsize=5)
-plt.xlabel('Models')
-plt.ylabel('Mean Values')
-plt.title('Mean and Standard Deviation of Models')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-plt.show()
-
-plt.figure(figsize=(12, 8))
-for data in comparison_data:
-    plt.plot(data["ds"], data["y"], label=data["Model"], marker='o')
-plt.xlabel('Date')
-plt.ylabel('Values')
-plt.title('Time Series Comparison Between Models')
-plt.legend()
-plt.grid()
-plt.tight_layout()
-plt.show()
-
-plt.figure(figsize=(12, 8))
-for model_name, values in distribution_data.items():
-    plt.hist(values, bins=20, alpha=0.5, label=model_name)
-plt.xlabel('Predicted Values')
-plt.ylabel('Frequency')
-plt.title('Distribution of Predicted Values by Model')
+# Ajustando o eixo x
+plt.xticks(x, df["Model"], rotation=45)
+plt.xlabel("Models")
+plt.ylabel("Values")
+plt.title("Comparison of Ground Truth and Error Metrics Across Models")
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-plt.figure(figsize=(12, 8))
-plt.boxplot(distribution_data.values(), labels=distribution_data.keys(), vert=False)
-plt.xlabel('Predicted Values')
-plt.ylabel('Models')
-plt.title('Boxplot of Predicted Values by Model')
-plt.tight_layout()
-plt.show()
-
-if not cv_metrics_df.empty:
-    plt.figure(figsize=(12, 6))
-    plt.bar(cv_metrics_df["Model"], cv_metrics_df["Mean RMSE"], yerr=cv_metrics_df["Std RMSE"], capsize=5)
-    plt.xlabel('Models')
-    plt.ylabel('Mean RMSE (Cross-Validation)')
-    plt.title('Mean and Standard Deviation of RMSE by Model (Cross-Validation)')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.show()
-
-fold_results = {}
-for file in csv_files:
-    cv_file_path = os.path.join(data_folder, file.replace("_model_full_forecast.csv", "_cv_metrics.csv"))
-    if os.path.exists(cv_file_path):
-        cv_metrics_df = pd.read_csv(cv_file_path)
-        model_name = file.replace("_model_full_forecast.csv", "")
-        fold_results[model_name] = cv_metrics_df['RMSE']
-
-if fold_results:
-    plt.figure(figsize=(12, 8))
-    plt.boxplot(fold_results.values(), labels=fold_results.keys(), vert=False)
-    plt.xlabel('RMSE')
-    plt.ylabel('Models')
-    plt.title('Boxplot of RMSE by Model (Cross-Validation)')
-    plt.tight_layout()
-    plt.show()

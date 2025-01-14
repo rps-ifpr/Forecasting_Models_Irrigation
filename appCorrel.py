@@ -2,15 +2,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("data\data_est_local.CSV", delimiter=';')
+df = pd.read_csv("data\data_est_local1.CSV", delimiter=';')
 
 print("Available columns in the DataFrame:")
 print(df.columns)
 
 # Original column name in the DataFrame
-target_variable = "TEMPERATURA DO AR BULBO SECO (°C)"
+target_variable = "Temperatura do ar bulbo seco (°C)"
 # Translated name for display
-target_variable_display = "AIR TEMPERATURE DRY BULB (°C)"
+target_variable_display = "Air Temperature Dry Bulb(°C)"
 
 if target_variable not in df.columns:
     print(f"Error: The variable '{target_variable}' was not found in the DataFrame.")

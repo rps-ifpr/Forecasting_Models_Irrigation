@@ -5,8 +5,8 @@ import numpy as np
 # Dados do DataFrame
 data = {
     "Model": [
-        "Autoformer", "BiTCN", "DeepAR", "DilatedRNN", "GRU", "iTransformer",
-        "RNN", "TCN", "TFT", "FEDformer", "Informer", "LSTM", "PatchTST", "VanillaTransformer"
+        "Former", "Bitcn", "Deepar", "Dilatedrnn", "Gru", "iTransformer",
+        "Rnn", "Tcn", "Tft", "Fedformer", "Informer", "Lstm", "Patchtst", "VanillaTransformer"
     ],
     "RMSE": [
         1.9315098126022487, 19.627571275658628, 12.044608525508744, 12.108568551898989, 9.60784783737621,
