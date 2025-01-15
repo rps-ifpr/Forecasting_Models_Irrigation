@@ -1,59 +1,41 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import unicodedata
+import matplotlib
 
-def normalize_columns(columns):
-    normalized_columns = []
-    for col in columns:
-        normalized_col = ''.join(
-            c for c in unicodedata.normalize('NFD', col)
-            if unicodedata.category(c) != 'Mn'
-        )
-        normalized_col = ' '.join(normalized_col.upper().strip().split())
-        normalized_columns.append(normalized_col)
-    return normalized_columns
+# Configurar backend interativo para PyCharm
+matplotlib.use('module://backend_interagg')
 
-try:
-    data = pd.read_csv('../data/data_est_local.csv', sep=';', encoding='utf-8')
+# Ler o arquivo gerado
+data_path = '../data/generated_data_models.csv'
+data = pd.read_csv(data_path)
 
-    data.columns = normalize_columns(data.columns)
-    print("Available columns in the CSV after normalization:", data.columns.tolist())
+# Converter a coluna "Date" para formato de data
+data['Date'] = pd.to_datetime(data['Date'])
 
-    required_columns = ['DATA', 'HORA', 'TEMPERATURA DO AR BULBO SECO (°C)']
-    if not all(column in data.columns for column in required_columns):
-        raise ValueError(f"The CSV file must contain the columns: {required_columns}")
+# Lista de modelos
+models = [
+    "iTransformer", "PatchTST", "FEDformer", "Autoformer", "Informer", "TFT",
+    "VanillaTransformer", "BiTCN", "DilatedRNN", "DeepAR", "TCN", "GRU", "RNN", "LSTM"
+]
 
-    data['ds'] = pd.to_datetime(data['DATA'] + ' ' + data['HORA'], dayfirst=True, errors='coerce')
+# Gerar gráficos individuais para cada modelo
+for model in models:
+    plt.figure(figsize=(10, 6))
 
-    if data['ds'].isnull().any():
-        raise ValueError("Some dates and times could not be converted. Check the format of the 'DATA' and 'HORA' columns.")
+    # Plotar os dados do modelo
+    plt.plot(data['Date'], data[model], label=f"{model}", color='blue', linewidth=1.5)
 
-    filtered_data = data[['ds', 'TEMPERATURA DO AR BULBO SECO (°C)']].rename(columns={
-        'TEMPERATURA DO AR BULBO SECO (°C)': 'Temperature'
-    })
+    # Plotar o "Ground Truth"
+    plt.plot(data['Date'], data['GroundTruth'], label="Ground Truth", color='black', linestyle='--', linewidth=2)
 
-    filtered_data.dropna(subset=['Temperature'], inplace=True)
-
-    filtered_data['Temperature'] = pd.to_numeric(filtered_data['Temperature'], errors='coerce')
-
-    filtered_data.dropna(subset=['Temperature'], inplace=True)
-
-    plt.figure(figsize=(12, 6))
-    plt.plot(filtered_data['ds'], filtered_data['Temperature'], label='Temperature (°C)', color='blue', linewidth=1)
-    plt.title('Air Temperature (Dry Bulb) Over Time', fontsize=14)
-    plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Temperature (°C)', fontsize=12)
-    plt.legend()
-    plt.grid(True)
-    plt.gcf().autofmt_xdate()
+    # Configurações do gráfico
+    plt.title(f"Evolução Anual: {model} vs Ground Truth (2024)", fontsize=14)
+    plt.xlabel("Date", fontsize=12)
+    plt.ylabel("Values", fontsize=12)
+    plt.legend(fontsize=10)
+    plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
 
+    # Exibir o gráfico no PyCharm
     plt.show()
-
-except FileNotFoundError:
-    print("Error: The file '../data/data_est_local.csv' was not found.")
-except ValueError as e:
-    print(f"Error: {e}")
-except Exception as e:
-    print(f"An unexpected error occurred: {e}")
 
