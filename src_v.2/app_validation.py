@@ -7,7 +7,7 @@ num_days = len(dates)
 
 np.random.seed(42)
 performance = {
-    'Autoformer': np.random.normal(loc=1.93, scale=0.2, size=num_days),
+    'Former': np.random.normal(loc=1.93, scale=0.2, size=num_days),
     'BiTCN': np.random.normal(loc=19.63, scale=1.5, size=num_days),
     'DeepAR': np.random.normal(loc=12.04, scale=0.5, size=num_days),
     'DilatedRNN': np.random.normal(loc=12.11, scale=0.7, size=num_days),
