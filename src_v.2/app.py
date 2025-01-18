@@ -1,60 +1,50 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
-# Gerar datas e número de dias
-dates = pd.date_range(start='2023-01-01', end='2023-12-31')
-num_days = len(dates)
+dates = pd.date_range(start='2023-11-01', end='2023-12-30', freq='D')
+num_points = len(dates)
 
-# Fixar a semente para reprodutibilidade
 np.random.seed(42)
+ground_truth = 25 + 5 * np.sin(2 * np.pi * np.arange(num_points) / 30) + np.random.normal(0, 2, num_points)
 
-# Simular performances dos modelos
+np.random.seed(42)
 performance = {
-    'Former': np.random.normal(loc=1.93, scale=0.2, size=num_days),
-    'BiTCN': np.random.normal(loc=19.63, scale=1.5, size=num_days),
-    'DeepAR': np.random.normal(loc=12.04, scale=0.5, size=num_days),
-    'DilatedRNN': np.random.normal(loc=12.11, scale=0.7, size=num_days),
-    'GRU': np.random.normal(loc=9.61, scale=0.8, size=num_days),
-    '.Informer': np.random.normal(loc=1.43, scale=0.1, size=num_days),
-    'RNN': np.random.normal(loc=10.80, scale=1.0, size=num_days),
-    'TCN': np.random.normal(loc=24.05, scale=2.0, size=num_days),
-    'TFT': np.random.normal(loc=5.20, scale=0.6, size=num_days),
-    'FEDformer': np.random.normal(loc=2.81, scale=0.3, size=num_days),
-    'Informer': np.random.normal(loc=3.19, scale=0.4, size=num_days),
-    'LSTM': np.random.normal(loc=9.79, scale=0.9, size=num_days),
-    'PatchTST': np.random.normal(loc=1.46, scale=0.05, size=num_days),
-    'VanillaTransformer': np.random.normal(loc=2.57, scale=0.3, size=num_days)
+    'iTransformer': ground_truth + np.random.normal(0, 1.5, num_points),
+    'PatchTST': ground_truth + 1 + np.random.normal(0, 2.0, num_points),
+    'FEDformer': ground_truth - 1 + np.random.normal(0, 1.0, num_points),
+    'Autoformer': ground_truth + 2 + np.random.normal(0, 2.5, num_points),
+    'Informer': ground_truth - 2 + np.random.normal(0, 2.2, num_points),
+    'TFT': ground_truth + 3 + np.random.normal(0, 1.8, num_points),
+    'VanillaTransformer': ground_truth - 3 + np.random.normal(0, 2.0, num_points),
+    'BiTCN': ground_truth + np.linspace(0, 3, num_points) + np.random.normal(0, 2.2, num_points),
+    'DilatedRNN': ground_truth - np.linspace(0, 3, num_points) + np.random.normal(0, 2.3, num_points),
+    'DeepAR': ground_truth + np.linspace(0, 2, num_points) + np.random.normal(0, 1.5, num_points),
+    'TCN': ground_truth - np.linspace(0, 2, num_points) + np.random.normal(0, 1.8, num_points),
+    'GRU': ground_truth + 0.5 + np.random.normal(0, 1.2, num_points),
+    'RNN': ground_truth - 0.5 + np.random.normal(0, 1.0, num_points),
+    'LSTM': ground_truth + np.linspace(-1, 1, num_points) + np.random.normal(0, 1.5, num_points),
 }
 
-# Simular Ground Truth
-performance['Ground Truth'] = np.random.normal(loc=10.0, scale=0.5, size=num_days)
-
-# Criar DataFrame com os dados
 data = pd.DataFrame(index=dates, data=performance)
 
-# Criar subplots
-fig, axs = plt.subplots((len(data.columns) + 1) // 2, 2, figsize=(15, 20))
-fig.subplots_adjust(hspace=0.5, wspace=0.3)
-axs = axs.ravel()
+data['Ground Truth'] = ground_truth
 
-# Plotar os dados
-for i, (model_name, model_data) in enumerate(data.items()):
-    axs[i].plot(data.index, model_data, label='Model Performance')
-    axs[i].plot(data.index, performance['Ground Truth'], color='red', label='Ground Truth', linewidth=1, linestyle='--')
-    axs[i].set_title(f"Model Performance {model_name}")
-    axs[i].set_xlabel("Date")
-    axs[i].set_ylabel("Simulated Error")
-    axs[i].grid(True)
+plt.figure(figsize=(14, 8))
 
-    # Linhas verticais para treinos e validações
-    end_train = pd.to_datetime('2023-06-30')
-    end_validation = pd.to_datetime('2023-09-30')
-    axs[i].axvline(end_train, color='red', linestyle='--', label='End of Training')
-    axs[i].axvline(end_validation, color='green', linestyle='--', label='End of Validation')
-    axs[i].legend(loc='upper right')
+colors = cm.gray(np.linspace(0.3, 1, len(performance)))
 
-# Ajustar layout e exibir
+for color, (model_name, model_data) in zip(colors, performance.items()):
+    plt.plot(data.index, model_data, color=color, label=model_name, linewidth=1.5, alpha=0.8)
+
+plt.plot(data.index, data['Ground Truth'], color='red', label='Ground Truth', linewidth=2.5, linestyle='--')
+
+plt.title("Tendências dos Modelos com Ground Truth", fontsize=16)
+plt.xlabel("Data", fontsize=12)
+plt.ylabel("Indice", fontsize=12)
+plt.legend(loc="upper left", fontsize=9, ncol=2)
+plt.grid(True, linestyle='--', linewidth=0.5)
 plt.tight_layout()
-plt.show()
 
+plt.show()
