@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# Dados fornecidos
 data = {
     "Model": [
         "Former", "Bitcn", "Deepar", "Dilatedrnn", "Gru", "iTransformer",
@@ -30,20 +29,20 @@ data = {
     ]
 }
 
-# Simulação do Ground Truth
+
 np.random.seed(42)
 num_models = len(data["Model"])
 ground_truth = np.random.uniform(low=0.5, high=3.0, size=num_models)
 
-# Organizando os dados em um DataFrame
+
 df = pd.DataFrame(data)
 df["Ground Truth"] = ground_truth
 
-# Comparação de valores reais e previstos
+
 plt.figure(figsize=(14, 7))
 plt.plot(df["Model"], df["Ground Truth"], 'o-', label="Ground Truth", color="black")
 
-# Adicionando as previsões dos modelos como barras
+
 bar_width = 0.2
 x = np.arange(len(df["Model"]))
 
@@ -52,7 +51,7 @@ plt.bar(x - bar_width, df["RMSPE"], bar_width, label="RMSPE")
 plt.bar(x, df["Max Abs Error"], bar_width, label="Max Abs Error")
 plt.bar(x + bar_width, df["Mean Abs Error"], bar_width, label="Mean Abs Error")
 
-# Ajustando o eixo x
+
 plt.xticks(x, df["Model"], rotation=45)
 plt.xlabel("Models")
 plt.ylabel("Values")

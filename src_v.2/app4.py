@@ -20,13 +20,13 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
     os.makedirs(model_output_path, exist_ok=True)
     os.makedirs(log_output_path, exist_ok=True)
 
-    # Adicionar validação cruzada
+
     print(f"Iniciando treinamento do modelo: {model_name} com validação cruzada...")
     start_time = time.time()
     models = [AutoTFT(h=horizon, loss=MAE(), config=config, num_samples=10)]
     nf = NeuralForecast(models=models, freq='H')
 
-    # Validação cruzada
+
     try:
         from sklearn.model_selection import TimeSeriesSplit
         tscv = TimeSeriesSplit(n_splits=3)
@@ -59,11 +59,11 @@ def train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_na
     full_forecast = pd.concat(forecasts, ignore_index=True)
     full_forecast['model_name'] = model_name
 
-    # Salvando previsões
+
     forecast_output_path = os.path.join(model_output_path, f'{applied_model_name}_{model_name}_full_forecast.csv')
     full_forecast.to_csv(forecast_output_path, index=False)
 
-    # Calculando métricas
+
     y_pred = full_forecast['y'].values[:len(Y_df['y'])]
     y_true = Y_df['y'].values[-len(y_pred):]
     rmse_value = rmse(y_true, y_pred)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     full_horizon = 20
     output_path = './output'
 
-    # Carregar dados
+
     Y_df = pd.read_csv(data_path, sep=';', usecols=lambda column: column != 'Unnamed: 19')
     Y_df['ds'] = pd.to_datetime(Y_df['Data'] + ' ' + Y_df['Hora'], errors='coerce')
     Y_df = Y_df.dropna(subset=['ds'])
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     model_name = 'AutoTFT_model'
     forecast, metrics = train_and_predict(Y_df, horizon, config, output_path, full_horizon, model_name)
 
-    # Plot comparativo
+
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')

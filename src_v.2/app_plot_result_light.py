@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Diretório de saída dos arquivos
 output_path = './output'
 
 def load_metrics(file_path, model_name):
@@ -23,7 +22,7 @@ def plot_metrics_overall(metrics_df, colors):
     plt.xlabel('Values')
     plt.ylabel('Metrics')
 
-    # Anotações nos gráficos
+
     for p in ax.patches:
         ax.annotate(f'{p.get_width():.2f}',
                     (p.get_width(), p.get_y() + p.get_height() / 2),
@@ -45,7 +44,7 @@ def plot_metrics_by_model_type(metrics_df, models, colors, metric, title_prefix)
         plt.xlabel('Value')
         plt.ylabel('Model')
 
-        # Anotações nos gráficos
+
         for p in ax.patches:
             ax.annotate(f'{p.get_width():.2f}',
                         (p.get_width(), p.get_y() + p.get_height() / 2),
@@ -55,18 +54,18 @@ def plot_metrics_by_model_type(metrics_df, models, colors, metric, title_prefix)
         plt.tight_layout()
         plt.show()
 
-# Modelos RNN e Transformer
+
 rnn_based_models = ['RNN', 'LSTM', 'GRU', 'TCN', 'DeepAR', 'DilatedRNN', 'BiTCN']
 transformer_based_models = ['TFT', 'VanillaTransformer', 'Informer', 'Autoformer', 'FEDformer', 'PatchTST', 'Informer']
 
-# Cores para os gráficos
+
 colors = [
     '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
     '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
     '#aec7e8', '#ffbb78', '#98df8a', '#ff9896'
 ]
 
-# Carregar métricas
+
 metrics_dfs = [
     load_metrics(f'{output_path}/lightning_logs/Autoformer_Autoformer_model/Autoformer_Autoformer_model_metrics.csv', 'Autoformer'),
     load_metrics(f'{output_path}/lightning_logs/AutoBiTCN_AutoBiTCN_model/AutoBiTCN_AutoBiTCN_model_metrics.csv', 'BiTCN'),
@@ -84,14 +83,14 @@ metrics_dfs = [
     load_metrics(f'{output_path}/lightning_logs/VanillaTransformer_VanillaTransformer_model/VanillaTransformer_VanillaTransformer_model_metrics.csv', 'VanillaTransformer')
 ]
 
-# Concatenar todas as métricas carregadas
+
 metrics_df = pd.concat([df for df in metrics_dfs if df is not None], ignore_index=True)
 metrics_df = metrics_df.set_index(['Model', 'model_name']).T
 
-# Gerar gráficos de todas as métricas
+
 plot_metrics_overall(metrics_df, colors)
 
-# Gerar gráficos separados para RNN e Transformers por métrica
+
 for metric in metrics_df.index:
     plot_metrics_by_model_type(metrics_df, rnn_based_models, colors, metric, 'RNN-Based')
     plot_metrics_by_model_type(metrics_df, transformer_based_models, colors, metric, 'Transformer-Based')

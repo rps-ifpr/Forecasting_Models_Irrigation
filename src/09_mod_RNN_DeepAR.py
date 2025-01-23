@@ -12,18 +12,18 @@ import os
 def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horizon, model_name):
     """Treina o modelo AutoDeepAR, salva previsões e métricas nos diretórios especificados."""
 
-    # Nome do modelo aplicado
+
     applied_model_name = 'AutoDeepAR'
 
-    # Diretórios para salvar o modelo e resultados
+
     model_output_path = os.path.join(output_path, 'checkpoints', f"{applied_model_name}_{model_name}")
     log_output_path = os.path.join(output_path, 'lightning_logs', f"{applied_model_name}_{model_name}")
 
-    # Criação dos diretórios, caso não existam
+
     os.makedirs(model_output_path, exist_ok=True)
     os.makedirs(log_output_path, exist_ok=True)
 
-    # Treinamento do modelo
+
     start_time = time.time()
     models = [DeepAR(
         h=horizon,
@@ -44,10 +44,10 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
     end_time = time.time()
     print(f'Modelo {model_name} treinado em:', end_time - start_time, 'segundos')
 
-    # Carregando o modelo treinado para previsão
+
     nf_loaded = NeuralForecast.load(path=model_output_path)
 
-    # Previsões de múltiplos passos
+
     n_predicts = math.ceil(full_horizon / horizon)
     combined_train = Y_df[['unique_id', 'ds', 'y']].copy()
     forecasts = []
@@ -55,7 +55,7 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
     for _ in range(n_predicts):
         step_forecast = nf_loaded.predict(df=combined_train)
 
-        # Identificar e renomear a coluna de previsão
+
         forecast_column = step_forecast.columns[-1]
         step_forecast = step_forecast.rename(columns={forecast_column: 'y'})
 
@@ -67,12 +67,12 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
     full_forecast = pd.concat(forecasts, ignore_index=True)
     full_forecast['model_name'] = model_name
 
-    # Salvando previsões em arquivo CSV
+
     forecast_output_path = os.path.join(model_output_path, f'{applied_model_name}_{model_name}_full_forecast.csv')
     full_forecast.to_csv(forecast_output_path, index=False)
     print(f"Previsões salvas em {forecast_output_path}")
 
-    # Calculando métricas
+
     y_pred = full_forecast['y'].values
     y_true = Y_df['y'].iloc[-len(y_pred):].values
     rmse_value = rmse(y_true, y_pred)
@@ -90,7 +90,7 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
         'Median Abs Error': medianabs_value
     }
 
-    # Salvando métricas no diretório lightning_logs
+
     metrics_df = pd.DataFrame([metrics])
     metrics_df.to_csv(os.path.join(log_output_path, f'{applied_model_name}_{model_name}_metrics.csv'), index=False)
     print(f"Métricas salvas em {log_output_path}")
@@ -104,17 +104,17 @@ if __name__ == '__main__':
     full_horizon = 20
     output_path = './output'
 
-    # Carregar dados e preparar para o treinamento
+
     Y_df = pd.read_csv(data_path, sep=';', usecols=lambda column: column != 'Unnamed: 19')
 
-    # Ajustar parsing de datas
+
     Y_df['ds'] = pd.to_datetime(Y_df['Data'] + ' ' + Y_df['Hora'], errors='coerce')
     Y_df = Y_df.dropna(subset=['ds'])
     Y_df['y'] = Y_df['TEMPERATURA DO AR BULBO SECO (°C)']
     Y_df['unique_id'] = 'serie_1'
     Y_df = Y_df.dropna(subset=['y']).sort_values('ds').reset_index(drop=True)
 
-    # Configuração do modelo AutoDeepAR
+
     config = {
         "input_size": 48,
         "lstm_n_layers": 3,
@@ -129,10 +129,10 @@ if __name__ == '__main__':
     model_name = 'AutoDeepAR_model'
     forecast, metrics = train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horizon, model_name)
 
-    # Plot comparativo
+
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Previsões do modelo AutoDeepAR
+
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
     ax1.set_xlabel('Tempo')
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     ax1.legend()
     ax1.grid(linestyle='-', which='both')
 
-    # Métricas do modelo
+
     metrics_df = pd.DataFrame([metrics])
     metrics_df.set_index('model_name', inplace=True)
     metrics_df.plot(kind='bar', ax=ax2)

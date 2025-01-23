@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Dados do DataFrame
+
 data = {
     "Model": [
         "Former", "Bitcn", "Deepar", "Dilatedrnn", "Gru", "iTransformer",
@@ -37,7 +37,7 @@ data = {
 df = pd.DataFrame(data)
 
 
-# Função para gerar gráficos com gradiente
+
 def plot_metric_with_gradient(df, metric, cmap='viridis'):
     """
     Gera um gráfico de barras horizontais com gradiente para uma métrica específica.
@@ -47,32 +47,32 @@ def plot_metric_with_gradient(df, metric, cmap='viridis'):
     - metric: Métrica a ser visualizada.
     - cmap: Mapa de cores para o gradiente.
     """
-    # Ordenar o DataFrame pela métrica
+
     df_sorted = df.sort_values(by=metric)
     values = df_sorted[metric]
 
-    # Normalização para o gradiente de cores
+
     norm = plt.Normalize(vmin=values.min(), vmax=values.max())
     scalarmap = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
 
-    # Configuração do gráfico
+
     fig, ax = plt.subplots(figsize=(12, 8))
     bars = ax.barh(df_sorted["Model"], values, color=scalarmap.to_rgba(values))
     ax.set_xlabel(metric, fontsize=12)
     ax.set_ylabel("Model", fontsize=12)
     ax.set_title(f"Comparison of Models by {metric}", fontsize=14, fontweight='bold')
 
-    # Adicionar barra de cores
+
     cbar = fig.colorbar(scalarmap, ax=ax, orientation='vertical', pad=0.02)
     cbar.ax.set_ylabel(f"{metric} (Scale)", rotation=270, labelpad=20, fontsize=10)
 
-    # Ajustes finais
+
     ax.grid(axis='x', linestyle='--', alpha=0.7)
     fig.tight_layout()
     plt.show()
 
 
-# Gerar gráficos para cada métrica
+
 metrics = ["RMSE", "RMSPE", "Max Abs Error", "Mean Abs Error", "Median Abs Error"]
 for metric in metrics:
     plot_metric_with_gradient(df, metric)

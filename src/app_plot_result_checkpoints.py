@@ -32,10 +32,10 @@ metrics_dfs = [
 
 metrics_df = pd.concat([df for df in metrics_dfs if df is not None], ignore_index=True)
 
-# Save the metrics DataFrame to a CSV file for further analysis or use in LaTeX tables
+
 metrics_df.to_csv('model_metrics_summary.csv', index=False)
 
-# Transpose for plotting and further analysis
+
 metrics_df = metrics_df.set_index(['Model', 'model_name']).T
 
 rnn_based_models = ['AutoRNN', 'LSTM', 'AutoGRU', 'AutoTCN', 'AutoDeepAR', 'AutoDilatedRNN', 'AutoBiTCN']

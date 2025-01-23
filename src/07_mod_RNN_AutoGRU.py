@@ -138,7 +138,7 @@ if __name__ == '__main__':
     ax1.legend()
     ax1.grid(linestyle='-', which='both')
 
-  
+
     metrics_df = pd.DataFrame([metrics])
     metrics_df.set_index('model_name', inplace=True)
     metrics_df.plot(kind='bar', ax=ax2)

@@ -3,7 +3,7 @@ import seaborn as sns
 import numpy as np
 import pandas as pd
 
-# Dados
+
 models = ['Autoformer', 'BiTCN', 'DeepAR', 'DilatedRNN', 'GRU', 'Informer', 'RNN', 'TCN', 'TFT', 'FEDformer', 'Informer', 'LSTM', 'PatchTST', 'VanillaT_former']
 metrics = ['RMSE', 'RMSPE', 'MaxAbsE', 'MeanAbsE', 'MedianAbsE']
 data = np.array([
@@ -23,10 +23,10 @@ data = np.array([
     [2.57, 1.19, 4.72, 2.29, 2.36]
 ])
 
-# Cria um DataFrame para melhor manipulação dos dados
+
 df = pd.DataFrame(data, index=models, columns=metrics)
 
-# Cria o gráfico de calor
+
 plt.figure(figsize=(11, 8))
 sns.heatmap(df, annot=True, fmt=".2f", cmap='viridis', linewidths=.5, linecolor='gray')
 plt.title('Heatmap of Model Performance Metrics')

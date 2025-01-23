@@ -10,7 +10,6 @@ from statsmodels.tools.eval_measures import rmse, rmspe, maxabs, meanabs, median
 import math
 import os
 
-
 def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horizon, model_name):
     """Treina o modelo AutoDeepAR, salva previsões e métricas nos diretórios especificados."""
 
@@ -21,9 +20,9 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
     os.makedirs(model_output_path, exist_ok=True)
     os.makedirs(log_output_path, exist_ok=True)
 
-    # Validação cruzada
+
     print(f"Iniciando treinamento do modelo: {model_name} com validação cruzada...")
-    start_time = time.time()  # Captura o tempo de início do treinamento
+    start_time = time.time()
     try:
         tscv = TimeSeriesSplit(n_splits=3)
         for train_index, test_index in tscv.split(Y_df):
@@ -64,11 +63,11 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
         nf.fit(df=Y_df[['unique_id', 'ds', 'y']])
 
     nf.save(path=model_output_path, model_index=None, overwrite=True, save_dataset=True)
-    end_time = time.time()  # Captura o tempo de término do treinamento
+    end_time = time.time()
     print(f"Modelo {model_name} treinado em: {end_time - start_time:.2f} segundos")
     print(f"Modelo {model_name} salvo com sucesso!")
 
-    # Previsões
+
     nf_loaded = NeuralForecast.load(path=model_output_path)
     n_predicts = math.ceil(full_horizon / horizon)
     combined_train = Y_df[['unique_id', 'ds', 'y']].copy()
@@ -77,7 +76,7 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
     for _ in range(n_predicts):
         step_forecast = nf_loaded.predict(df=combined_train)
 
-        # Renomear a coluna de previsão dinamicamente
+
         forecast_column = step_forecast.columns[-1]
         step_forecast = step_forecast.rename(columns={forecast_column: 'y'})
 
@@ -89,12 +88,12 @@ def train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horiz
     full_forecast = pd.concat(forecasts, ignore_index=True)
     full_forecast['model_name'] = model_name
 
-    # Salvando previsões
+
     forecast_output_path = os.path.join(model_output_path, f'{applied_model_name}_{model_name}_full_forecast.csv')
     full_forecast.to_csv(forecast_output_path, index=False)
     print(f"Previsões salvas em {forecast_output_path}")
 
-    # Calculando métricas
+
     y_pred = full_forecast['y'].values
     y_true = Y_df['y'].iloc[-len(y_pred):].values
     rmse_value = rmse(y_true, y_pred)
@@ -125,7 +124,7 @@ if __name__ == '__main__':
     full_horizon = 20
     output_path = './output'
 
-    # Carregar dados
+
     Y_df = pd.read_csv(data_path, sep=';', usecols=lambda column: column != 'Unnamed: 19')
     Y_df['ds'] = pd.to_datetime(Y_df['Data'] + ' ' + Y_df['Hora'], errors='coerce')
     Y_df = Y_df.dropna(subset=['ds'])
@@ -135,7 +134,7 @@ if __name__ == '__main__':
 
     print("Intervalo de Datas:", Y_df['ds'].min(), "até", Y_df['ds'].max())
 
-    # Configuração do modelo AutoDeepAR
+
     config = {
         "input_size": 48,
         "lstm_n_layers": 3,
@@ -150,7 +149,7 @@ if __name__ == '__main__':
     model_name = 'AutoDeepAR_model'
     forecast, metrics = train_and_predict_auto_deepar(Y_df, horizon, config, output_path, full_horizon, model_name)
 
-    # Plot comparativo
+
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
     ax1.plot(Y_df['ds'], Y_df['y'], label='Dados Originais', color='black')
     ax1.plot(forecast['ds'], forecast['y'], label=f'Previsão {model_name}', color='blue')
