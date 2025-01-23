@@ -42,8 +42,6 @@ With the increasing demand for accurate weather forecasts, this project explores
 
 The project structure is organized as described below.
 
-## Directory Structure Version 1
-
 ```plaintext
 ## Directory Structure Version 2
 
@@ -83,7 +81,7 @@ The project structure is organized as described below.
 │       ├── myplot_app11.png # Plot generated for app11
 │       ├── myplot_app12.png # Plot generated for app12
 │       └── model_metrics_summary.csv # Metrics summary for models
-
+```
 
 ## ⚙️ Features
 - Evaluation of 14 neural network models applied to meteorological time series forecasting:
