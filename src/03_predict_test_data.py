@@ -20,14 +20,14 @@ import math
 def train_and_predict(data_path, horizon, config, output_path, full_horizon):
     """Treina o modelo, salva e faz previsões."""
 
-    # Load the data
+
     Y_df = pd.read_csv(data_path, sep=';')
 
-    # Set the threshold until the max
+
     max = np.where(Y_df.y == np.max(Y_df.y))
     Y_df = Y_df[0:max[-1][-1]]
 
-    # Plota os dados originais
+
     plt.figure(figsize=(6, 3))
     plt.plot(Y_df.y, 'k')
     plt.axis([0, len(list(Y_df.y)), 0, 100])
@@ -38,7 +38,7 @@ def train_and_predict(data_path, horizon, config, output_path, full_horizon):
 
     Y_df['ds'] = pd.to_datetime(Y_df['ds'], format='%d/%m/%y %H:%M')
 
-    # Treinamento do modelo
+
     start_time = time.time()
     models = [AutoTFT(h=horizon,
                       loss=MAE(),
@@ -57,12 +57,12 @@ def train_and_predict(data_path, horizon, config, output_path, full_horizon):
     end_time = time.time()
     print('Time to train model:', end_time - start_time)
 
-    # Carregando o modelo treinado
+
     model = AutoTFT(h=1, loss=MAE(), config=config, num_samples=10)
     nf_loaded = NeuralForecast(models=[model], freq='H')
     nf_loaded = NeuralForecast.load(path=output_path)
 
-    # Faz previsões
+
     Y_hat_df = nf_loaded.predict(df=Y_df)
     y_pred = Y_hat_df.AutoTFT
     y_true = Y_df[-horizon:].y
@@ -70,12 +70,12 @@ def train_and_predict(data_path, horizon, config, output_path, full_horizon):
     end_time = time.time()
     print('Time to create models:', end_time - start_time)
 
-    # rmse & rmspe & maxabs & meanabs & medianabs & time
+
     print(
         f'{(rmse(y_true, y_pred)):.2E} & {(rmspe(y_true, y_pred)):.2E} & {(maxabs(y_true, y_pred)):.2E} & {(meanabs(y_true, y_pred)):.2E} & {(medianabs(y_true, y_pred)):.2E} '
     )
 
-    # Previsões de múltiplos passos
+
     n_predicts = math.ceil(full_horizon / model.h)
     combined_train = Y_df
     forecasts = []

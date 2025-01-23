@@ -19,10 +19,10 @@ from statsmodels.tools.eval_measures import iqr #interquartile range of error
 import math
 
 
-# Load the data
+
 Y_df = pd.read_csv('../data/data.csv', sep=';')
 
-# Set the threshold until the max
+
 max = np.where(Y_df.y==np.max(Y_df.y))
 Y_df = Y_df[0:max[-1][-1]]
 
@@ -39,7 +39,7 @@ Y_df = Y_df[0:max[-1][-1]]
 Y_df['ds'] = pd.to_datetime(Y_df['ds'], format='%d/%m/%y %H:%M')
 
 horizon = 1
-# Configuration of hyperparameter search space.
+
 config = {
       "input_size": tune.choice([horizon]),
       "hidden_size": tune.choice([8, 32]),
@@ -70,12 +70,12 @@ nf = NeuralForecast(
         save_dataset=True)
 
 
-# Recriar o NeuralForecast com o modelo carregado
+
 model = AutoTFT(h=1, loss=MAE(), config=config, num_samples=10)
 nf_loaded = NeuralForecast(models=[model], freq='H')
 nf_loaded = NeuralForecast.load(path='../checkpoints/test_run/')
 
-# Agora pode prever
+
 Y_hat_df = nf_loaded.predict(df=Y_df)
 
 y_pred = Y_hat_df.AutoTFT
@@ -85,7 +85,7 @@ y_true = Y_df[-horizon:].y
 end_time = time.time()
 print('Time to create models:', end_time - start_time)
 
-# rmse & rmspe & maxabs & meanabs & medianabs & time
+
 print(f'{(rmse(y_true, y_pred)):.2E} & {(rmspe(y_true, y_pred)):.2E} & {(maxabs(y_true, y_pred)):.2E} & {(meanabs(y_true, y_pred)):.2E} & {(medianabs(y_true, y_pred)):.2E} ')
 
 

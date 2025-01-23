@@ -9,10 +9,10 @@ from neuralforecast.core import NeuralForecast
 def train_model(data_path, horizon, config, output_path):
     """Treina e salva o modelo."""
 
-    # Load the data
+
     Y_df = pd.read_csv(data_path, sep=';')
 
-    # Set the threshold until the max
+
     max = np.where(Y_df.y == np.max(Y_df.y))
     Y_df = Y_df[0:max[-1][-1]]
 
