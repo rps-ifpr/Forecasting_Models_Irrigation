@@ -108,6 +108,7 @@ This is the second version of the project, with significant improvements over th
 │       ├── myplot_app10.png       # Gráfico gerado para app10
 │       ├── myplot_app11.png       # Gráfico gerado para app11
 │       ├── myplot_app12.png       # Gráfico gerado para app12
+```
 
 ## ⚙️ Features
 - Evaluation of 14 neural network models applied to meteorological time series forecasting:
