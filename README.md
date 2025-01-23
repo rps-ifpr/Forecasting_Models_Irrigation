@@ -21,28 +21,28 @@
 </h4>
 
 <p align="center">
-	<!--<img alt="Status Em Desenvolvimento" src="https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-green"> -->
-	<img alt="Status Concluído" src="https://img.shields.io/badge/STATUS-CONCLU%C3%8DDO-brightgreen">  
+	<!--<img alt="Status In Development" src="https://img.shields.io/badge/STATUS-IN%20DEVELOPMENT-green"> -->
+	<img alt="Status Completed" src="https://img.shields.io/badge/STATUS-COMPLETED-brightgreen">  
 </p>
 
 <p align="center">
- <a href="#-sobre-o-projeto">Sobre</a> •
- <a href="#-funcionalidades">Funcionalidades</a> •
+ <a href="#-about-the-project">About</a> •
+ <a href="#-features">Features</a> •
  <a href="#-layout">Layout</a> • 
- <a href="#-como-executar-o-projeto">Como executar</a> • 
- <a href="#-tecnologias">Tecnologias</a> • 
- <a href="#-contribuidores">Contribuidores</a> • 
- <a href="#-autor">Autor</a> • 
- <a href="#user-content--licença">Licença</a>
+ <a href="#-how-to-run-the-project">How to Run</a> • 
+ <a href="#-technologies">Technologies</a> • 
+ <a href="#-contributors">Contributors</a> • 
+ <a href="#-author">Author</a> • 
+ <a href="#user-content--license">License</a>
 </p>
 
-## 💻 Sobre o projeto
+## 💻 About the project
 
-Com o aumento da demanda por previsões meteorológicas precisas, este projeto explora o uso de redes neurais, especialmente modelos Transformer e RNN, para capturar padrões complexos em séries temporais meteorológicas. Foram avaliados 14 modelos com a biblioteca [NeuralForecast](https://github.com/Nixtla/neuralforecast), utilizando métricas como RMSE, RMSPE, Max Abs Error, Mean Abs Error e Median Abs Error.
+With the increasing demand for accurate weather forecasts, this project explores the use of neural networks, especially Transformer models and RNNs, to capture complex patterns in meteorological time series. Fourteen models were evaluated using the [NeuralForecast](https://github.com/Nixtla/neuralforecast) library, employing metrics such as RMSE, RMSPE, Max Abs Error, Mean Abs Error, and Median Abs Error.
 
-A estrutura do projeto é organizada conforme descrito abaixo.
+The project structure is organized as described below.
 
-## Estrutura de Diretórios Versão 1
+## Directory Structure Version 1
 
 ```plaintext
 .
@@ -72,9 +72,9 @@ A estrutura do projeto é organizada conforme descrito abaixo.
 │       ├── app_plot_result_light.py         # Script para visualização de resultados simplificados
 │       └── model_metrics_summary.csv        # Resumo das métricas dos modelos
 
-Esta é a segunda versão do projeto, com melhorias significativas em relação à primeira. A principal diferença é a implementação completa da validação cruzada para todos os modelos, além de outras mudanças estruturais.
+This is the second version of the project, with significant improvements over the first. The main difference is the full implementation of cross-validation for all models, along with other structural changes.
 
-## Estrutura de Diretórios da Versão 2
+## Directory Structure Version 2
 
 ```plaintext
 .
@@ -108,101 +108,98 @@ Esta é a segunda versão do projeto, com melhorias significativas em relação 
 │       ├── myplot_app10.png       # Gráfico gerado para app10
 │       ├── myplot_app11.png       # Gráfico gerado para app11
 │       ├── myplot_app12.png       # Gráfico gerado para app12
+```
 
-## ⚙️ Funcionalidades
-- Avaliação de 14 modelos de redes neurais aplicados à previsão de séries temporais meteorológicas:
-  - **Modelos baseados em Transformer:**
-    - AutoInformer
-    - Autoformer
+## ⚙️ Features
+- Evaluation of 14 neural network models applied to meteorological time series forecasting:
+  - **Transformer-based Models:**
+    - Informer
+    - Former
     - PatchTST
     - FEDformer
     - VanillaTransformer
     - iTransformer
-  - **Modelos baseados em RNN:**
-    - AutoRNN
+  - **RNN-based Models:**
+    - RNN
     - LSTM
     - GRU
-    - AutoTCN
-    - AutoDeepAR
-    - AutoDilatedRNN
-    - AutoBiTCN
+    - TCN
+    - DeepAR
+    - DilatedRNN
+    - BiTCN
 
-- Utilização de dados meteorológicos reais, coletados de estações locais, com medições horárias no período de um ano (2023).
-- Comparação de desempenho dos modelos utilizando múltiplas métricas de erro:
+- Use of real meteorological data collected from local stations, with hourly measurements over a one-year period (2023).
+- Comparison of model performance using multiple error metrics:
   - RMSE (Root Mean Squared Error)
   - RMSPE (Root Mean Squared Percentage Error)
-  - Max Abs Error (Erro Máximo Absoluto)
-  - Mean Abs Error (Erro Médio Absoluto)
-  - Median Abs Error (Erro Absoluto Mediano)
+  - Max Abs Error
+  - Mean Abs Error
+  - Median Abs Error
 
-- Configuração e ajuste automático de hiperparâmetros:
-  - Utilização de validação cruzada e técnica de *early stopping*.
-  - Suporte a variáveis exógenas para melhorar a precisão preditiva.
+- Automatic configuration and hyperparameter tuning:
+  - Cross-validation and early stopping techniques.
+  - Support for exogenous variables to improve predictive accuracy.
 
-- Implementação de previsões de curto, médio e longo prazo:
-  - Previsão recursiva (utilizando previsões anteriores como entradas).
-  - Previsão direta (geração de todos os passos do horizonte de uma única vez).
+- Implementation of short, medium, and long-term forecasts:
+  - Recursive forecasting (using previous predictions as inputs).
+  - Direct forecasting (generating all horizon steps at once).
 
-- Visualização e análise dos resultados:
-  - Gráficos comparativos de métricas de desempenho entre os modelos.
-  - Análise detalhada das previsões e padrões sazonais capturados pelos modelos.
+- Visualization and analysis of results:
+  - Comparative performance charts across metrics for the models.
+  - Detailed analysis of forecasts and seasonal patterns captured by the models.
 
-- Armazenamento e organização dos resultados:
-  - Modelos treinados e logs de validação armazenados nos diretórios `checkpoints` e `lightning_logs`.
-  - Código e resultados disponibilizados no repositório GitHub para transparência e reprodutibilidade.
+- Storage and organization of results:
+  - Trained models and validation logs stored in the `checkpoints` and `lightning_logs` directories.
+  - Code and results made available in the GitHub repository for transparency and reproducibility.
 
+## 🛣️ How to Run the Project
 
-## 🛣️ Como executar o projeto
+### Prerequisites
 
-### Pré-requisitos
-
-Antes de começar, você precisa ter instalado:
+Before starting, ensure you have installed:
 - [Python 3.13](https://www.python.org/downloads/)
-- Bibliotecas específicas: Veja o arquivo `requirements.txt` no repositório.
+- Specific libraries: Check the `requirements.txt` file in the repository.
 
-### Execução
+### Execution
 
-1. Clone este repositório:
+1. Clone this repository:
    ```bash
    git clone https://github.com/rps-ifpr/Forecasting_Models_Irrigation.git
 
-## 🛠 Tecnologias
+## 🛠 Technologies
 
-O projeto foi desenvolvido utilizando as seguintes tecnologias e ferramentas:
+The project was developed using the following technologies and tools:
 
-- **Linguagem:** Python 3.13
-- **Bibliotecas:**
-  - **[NeuralForecast](https://github.com/Nixtla/neuralforecast):** Ferramenta avançada para previsão de séries temporais com suporte a modelos baseados em Redes Neurais (Transformers e RNNs).
-  - **[PyTorch](https://pytorch.org/):** Framework de aprendizado de máquina, utilizado para implementar e treinar os modelos.
-  - **[Pandas](https://pandas.pydata.org/):** Biblioteca para manipulação e análise de dados.
-  - **[Matplotlib](https://matplotlib.org/):** Biblioteca para visualização de dados e geração de gráficos comparativos.
-- **Recursos adicionais:**
-  - **Configuração automática de hiperparâmetros:** utilizando técnicas como `early stopping` e validação cruzada.
-  - **Suporte a variáveis exógenas:** integração de dados externos para enriquecer as previsões.
+- **Language:** Python 3.13
+- **Libraries:**
+  - **[NeuralForecast](https://github.com/Nixtla/neuralforecast):** Advanced tool for time series forecasting with support for neural network-based models (Transformers and RNNs).
+  - **[PyTorch](https://pytorch.org/):** Machine learning framework used to implement and train the models.
+  - **[Pandas](https://pandas.pydata.org/):** Library for data manipulation and analysis.
+  - **[Matplotlib](https://matplotlib.org/):** Library for data visualization and creation of comparative charts.
+- **Additional Features:**
+  - **Automatic Hyperparameter Tuning:** Using techniques like `early stopping` and cross-validation.
+  - **Support for Exogenous Variables:** Integration of external data to enhance forecasts.
 
-## 🧑‍💻 Autor
+## 🧑‍💻 Author
 
-Este projeto foi desenvolvido por **Rogério Pereira dos Santos**, pesquisador e desenvolvedor com foco em redes neurais aplicadas à previsão de séries temporais meteorológicas.
+This project was developed by **Rogério Pereira dos Santos**, a researcher and developer focused on neural networks applied to meteorological time series forecasting.
 
-- **Instituição:** Instituto Federal do Paraná (IFPR)
-- **Contato:**
-  - [LinkedIn](https://www.linkedin.com/in/rogerio-dosantos) — Conecte-se para discutir sobre redes neurais e projetos de previsão climática.
-  - [Email](mailto:rogerio.dosantos@ifpr.edu.br) — Para dúvidas ou colaborações relacionadas ao projeto.
-- **Publicações e Contribuições:**
-  - Publicações acadêmicas em previsão climática e machine learning.
-  - Experiência com tecnologias aplicadas à agricultura de precisão e sustentabilidade.
+- **Institution:** Federal Institute of Paraná (IFPR)
+- **Contact:**
+  - [LinkedIn](https://www.linkedin.com/in/rogerio-dosantos) — Connect to discuss neural networks and climate forecasting projects.
+  - [Email](mailto:rogerio.dosantos@ifpr.edu.br) — For questions or collaborations related to the project.
+- **Publications and Contributions:**
+  - Academic publications in climate forecasting and machine learning.
+  - Experience with technologies applied to precision agriculture and sustainability.
 
-Sinta-se à vontade para entrar em contato ou explorar os demais projetos no [GitHub](https://github.com/rps-ifpr).
+Feel free to get in touch or explore other projects on [GitHub](https://github.com/rps-ifpr).
 
-## 💪 Como contribuir para o projeto
-1. Faça um **fork** do projeto.
-2. Crie uma nova branch com as suas alterações: `git checkout -b my-feature`
-3. Salve as alterações e crie uma mensagem de commit contando o que você fez: `git commit -m "feature: My new feature"`
-4. Envie as suas alterações: `git push origin my-feature`
-> Caso tenha alguma dúvida confira este [guia de como contribuir no GitHub](./CONTRIBUTING.md)
+## 💪 How to Contribute to the Project
+1. **Fork** the project.
+2. Create a new branch for your changes: `git checkout -b my-feature`
+3. Save your changes and create a commit message describing what you did: `git commit -m "feature: My new feature"`
+4. Push your changes: `git push origin my-feature`
+> If you have any questions, check this [guide on how to contribute on GitHub](./CONTRIBUTING.md).
 
-
-## 📝 Licença
-<!-- Este projeto esta sobe a licença [MIT](./LICENSE). -->
-
-
+## 📝 License
+<!-- This project is under the [MIT](./LICENSE) license. -->
