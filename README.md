@@ -43,7 +43,7 @@ With the increasing demand for accurate weather forecasts, this project explores
 The project structure is organized as described below.
 
 
-## Directory Structure Version 2
+## Directory Structure
 
 ```
 .
