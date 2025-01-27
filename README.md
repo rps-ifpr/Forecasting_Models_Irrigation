@@ -42,45 +42,43 @@ With the increasing demand for accurate weather forecasts, this project explores
 
 The project structure is organized as described below.
 
-```plaintext
+
 ## Directory Structure Version 2
 
-```plaintext
+```
 .
-├── .venv/                   # Python virtual environment
-├── data/                    # Raw and processed data
-├── img/                     # Images generated during model execution
-├── src_v2/                  # Updated source code
-│   ├── lightning_logs/      # Training and validation logs for the models
-│   └── output/              # Scripts and model outputs
-│       ├── app4.py          # Updated model 4 script
-│       ├── app5.py          # Updated model 5 script
-│       ├── app6.py          # Updated model 6 script
-│       ├── app7.py          # Updated model 7 script
-│       ├── app8.py          # Updated model 8 script
-│       ├── app9.py          # Updated model 9 script
-│       ├── app10.py         # Updated model 10 script
-│       ├── app11.py         # Updated model 11 script
-│       ├── app12.py         # Updated model 12 script
-│       ├── app13.py         # Updated model 13 script
-│       ├── app14.py         # Updated model 14 script
-│       ├── app15.py         # Updated model 15 script
-│       ├── app16.py         # Updated model 16 script
-│       ├── app17.py         # Updated model 17 script
-│       ├── app_plot_result_checkpoints.py # Checkpoint visualization script
-│       ├── app_plot_result_light.py       # Simplified results visualization script
-│       ├── appv2-1.py       # Main script for joint execution
-│       ├── consolidated_model_metrics.csv # Consolidated metrics summary
-│       ├── myplot_app4.png  # Plot generated for app4
-│       ├── myplot_app5.png  # Plot generated for app5
-│       ├── myplot_app6.png  # Plot generated for app6
-│       ├── myplot_app7.png  # Plot generated for app7
-│       ├── myplot_app8.png  # Plot generated for app8
-│       ├── myplot_app9.png  # Plot generated for app9
-│       ├── myplot_app10.png # Plot generated for app10
-│       ├── myplot_app11.png # Plot generated for app11
-│       ├── myplot_app12.png # Plot generated for app12
-│       └── model_metrics_summary.csv # Metrics summary for models
+├── data/                   # Historical and forecast data
+│   ├── dados1975-2015.csv  # Main historical dataset (1975-2015)
+│   ├── data_est_local.CSV  # Local station data - dataset
+│   ├── data.csv            # Processed dataset
+│   ├── generated_data_models.csv  # Generated model data
+│   ├── v1/                 # Version 1 model forecasts
+│   └── v2/                 # Version 2 model forecasts
+├── img/                    # Visualization outputs
+│   ├── myplot*.png         # Various result visualizations
+│   ├── myplotcompmodels.png  # Model comparisons
+│   ├── myplotcorrelacao.png  # Correlation analysis
+│   └── myplotmapacalormetricas.png  # Metric heatmaps
+├── src/                    # Original implementation
+│   ├── 01_model.py         # Base model implementation
+│   ├── 02_train_model.py   # Training script
+│   ├── 03_predict_test_data.py  # Prediction script
+│   ├── 04_mod_Transfor_TFT.py   # Temporal Fusion Transformer
+│   ├── 05_mod_RNN_AutoRNN.py    # RNN implementation
+│   ├── ...                 # Other model implementations
+│   ├── output/             # Training outputs
+│   │   ├── checkpoints/    # Model checkpoints
+│   │   └── lightning_logs/ # Training logs
+│   └── model_metrics_summary.csv  # Model metrics
+├── src_v.2/                # Enhanced implementation
+│   ├── app*.py             # 17 individual application scripts
+│   ├── appv2-1.py          # Main application entry point
+│   ├── app_validation.py   # Validation scripts
+│   ├── consolidated_model_metrics.csv  # Detailed metrics
+│   ├── myplot_app*.png     # Model-specific visualizations
+│   └── lightning_logs/     # Extensive training logs (170+ versions)
+├── requirements.txt        # Python dependencies
+└── README.md               # This file
 ```
 
 ## ⚙️ Features
