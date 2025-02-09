@@ -2,7 +2,7 @@
 
 This repository contains machine learning models for forecasting irrigation-related time series data. The project implements and compares various deep learning architectures for time series forecasting, utilizing state-of-the-art methods to enhance accuracy and performance.
 
-## 📜 Project History
+## Project History
 
 - **Initial Implementation (`src/`)**
   - Developed core forecasting models.
@@ -17,7 +17,7 @@ This repository contains machine learning models for forecasting irrigation-rela
   - Generated improved model forecasts (v2).
   - Added detailed performance tracking.
 
-## 🗂 Repository Structure
+## Repository Structure
 
 ```plaintext
 .
@@ -55,7 +55,7 @@ This repository contains machine learning models for forecasting irrigation-rela
 └── README.md                                  # This file
 ```
 
-## 🛠 Implemented Models
+## Implemented Models
 
 The project includes implementations of:
 
@@ -76,14 +76,14 @@ The project includes implementations of:
 - PatchTST
 - iTransformer
 
-## 📊 Data Sources
+## Data Sources
 
 - Historical irrigation data from 1975-2015.
 - Local station data.
 - Generated forecast data from multiple models.
 - Model performance metrics.
 
-## 🔧 Usage
+## Usage
 
 Install dependencies:
 ```bash
@@ -115,7 +115,7 @@ python src_v.2/appv2-1.py
 python src_v.2/app4.py  # Example for model 4
 ```
 
-## 📈 Results
+## Results
 
 Model performance metrics are available in:
 - `src/model_metrics_summary.csv` (Original)
@@ -123,6 +123,6 @@ Model performance metrics are available in:
 
 Visualizations of model forecasts and comparisons are available in the `img/` directory.
 
-## 📄 License
+## License
 
 [MIT License](LICENSE)
