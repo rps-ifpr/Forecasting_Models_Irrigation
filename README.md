@@ -53,3 +53,33 @@ This repository contains machine learning models for forecasting irrigation-rela
 │   └── lightning_logs/                        # Extensive training logs (170+ versions)
 ├── requirements.txt                           # Python dependencies
 └── README.md                                  # This file
+
+```
+
+🛠 Implemented Models
+The project includes implementations of:
+
+RNN Variants
+
+Basic RNN
+LSTM
+GRU
+TCN (Temporal Convolutional Network)
+BiTCN (Bidirectional TCN)
+Dilated RNN
+DeepAR
+Transformer Variants
+
+Vanilla Transformer
+Informer
+Autoformer
+FEDformer
+PatchTST
+iTransformer
+📊 Data Sources
+Historical irrigation data from 1975-2015.
+Local station data.
+Generated forecast data from multiple models.
+Model performance metrics.
+🔧 Usage
+Install dependencies:
