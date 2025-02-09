@@ -56,30 +56,65 @@ This repository contains machine learning models for forecasting irrigation-rela
 
 ```
 
-🛠 Implemented Models
+## 🛠 Implemented Models
+
 The project includes implementations of:
 
-RNN Variants
+### RNN Variants
+- Basic RNN
+- LSTM
+- GRU
+- TCN (Temporal Convolutional Network)
+- BiTCN (Bidirectional TCN)
+- Dilated RNN
+- DeepAR
 
-Basic RNN
-LSTM
-GRU
-TCN (Temporal Convolutional Network)
-BiTCN (Bidirectional TCN)
-Dilated RNN
-DeepAR
-Transformer Variants
+### Transformer Variants
+- Vanilla Transformer
+- Informer
+- Autoformer
+- FEDformer
+- PatchTST
+- iTransformer
 
-Vanilla Transformer
-Informer
-Autoformer
-FEDformer
-PatchTST
-iTransformer
-📊 Data Sources
-Historical irrigation data from 1975-2015.
-Local station data.
-Generated forecast data from multiple models.
-Model performance metrics.
-🔧 Usage
+## 📊 Data Sources
+
+- Historical irrigation data from 1975-2015.
+- Local station data.
+- Generated forecast data from multiple models.
+- Model performance metrics.
+
+## 🔧 Usage
+
 Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+# Training
+python src/02_train_model.py
+
+# Prediction
+python src/03_predict_test_data.py
+
+# Visualization
+python src/app_plot_result_light.py
+
+
+# Main application
+python src_v.2/appv2-1.py
+
+# Specific model execution
+python src_v.2/app4.py  # Example for model 4
+
+## 📈 Results
+
+Model performance metrics are available in:
+- `src/model_metrics_summary.csv` (Original)
+- `src_v.2/consolidated_model_metrics.csv` (Enhanced)
+
+Visualizations of model forecasts and comparisons are available in the `img/` directory.
+
+## 📄 License
+
+[MIT License](LICENSE)
