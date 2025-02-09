@@ -53,7 +53,6 @@ This repository contains machine learning models for forecasting irrigation-rela
 │   └── lightning_logs/                        # Extensive training logs (170+ versions)
 ├── requirements.txt                           # Python dependencies
 └── README.md                                  # This file
-
 ```
 
 ## 🛠 Implemented Models
@@ -91,21 +90,30 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-# Training
+### Training
+```bash
 python src/02_train_model.py
+```
 
-# Prediction
+### Prediction
+```bash
 python src/03_predict_test_data.py
+```
 
-# Visualization
+### Visualization
+```bash
 python src/app_plot_result_light.py
+```
 
-
-# Main application
+### Main application
+```bash
 python src_v.2/appv2-1.py
+```
 
-# Specific model execution
+### Specific model execution
+```bash
 python src_v.2/app4.py  # Example for model 4
+```
 
 ## 📈 Results
 
